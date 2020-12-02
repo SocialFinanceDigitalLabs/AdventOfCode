@@ -1,55 +1,58 @@
 #! /usr/bin/env python
 import argparse
-from tqdm import tqdm
-from kws.aoc2020 import split_input
+import itertools
 
 
-def find_target(input, target=2020):
-    input.sort()
+def find_target(input, target=2020, combinations=2):
+    """
+    Finds 'combinations' numbers that add up to 2020
 
-    pbar = tqdm(input)
-    for v1 in pbar:
-        for v2 in input[::-1]:
-            pbar.desc = f"{v1} + {v2} = {v1+v2}"
-            if v1+v2 == target:
-                return v1, v2
-            elif v1+v2 > target:
-                continue
+    Part 1:
+    >>> find_target([1721, 979, 366, 299, 675, 1456])
+    (1721, 299)
 
+    Part 2:
+    >>> find_target([1721, 979, 366, 299, 675, 1456], combinations=3)
+    (979, 366, 675)
 
-def find_three_target(input, target=2020):
-    input.sort()
+    :param input:
+    :param target:
+    :param combinations:
+    :return:
+    """
 
-    pbar = tqdm(input)
-    for v1 in pbar:
-        for v2 in input[::-1]:
-            for v3 in input[::-1]:
-                pbar.desc = f"{v1} + {v2} + {v3} = {v1+v2+v3}"
-                if v1+v2+v3 == target and v2 != v3:
-                    return v1, v2, v3
-            if v1+v2 > target:
-                continue
+    for x in itertools.combinations(input, combinations):
+        if sum(x) == 2020:
+            return x
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Day 1 of Advent of Code 2020')
     parser.add_argument('file', metavar='filename', type=argparse.FileType('rt'),
                         help='filename to your personal inputs')
+    parser.add_argument('--test', '-t', action='store_true')
 
     args = parser.parse_args()
 
-    with args.file as FILE:
-        input = FILE.read()
+    if args.test:
+        import doctest
+        doctest.testmod()
 
-    values = split_input(input, type=int)
+        print("Tests completed")
+        exit(0)
+
+    with args.file as FILE:
+        values = FILE.readlines()
+
+    values = [int(v) for v in values]
 
     v1, v2 = find_target(values)
     assert v1+v2 == 2020
 
     print(f"The answer to part 1 is {v1} * {v2} = {v1*v2}")
 
-    v1, v2, v3 = find_three_target(values)
+    v1, v2, v3 = find_target(values, combinations=3)
     assert v1+v2+v3 == 2020
 
-    print(f"The answer to part 1 is {v1} * {v2} * {v3} = {v1*v2*v3}")
+    print(f"The answer to part 2 is {v1} * {v2} * {v3} = {v1*v2*v3}")
 
