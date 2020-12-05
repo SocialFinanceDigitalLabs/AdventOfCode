@@ -117,7 +117,7 @@ def is_valid_part_2(record):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Day 3 of Advent of Code 2020')
+    parser = argparse.ArgumentParser(description='Day 4 of Advent of Code 2020')
     parser.add_argument('file', metavar='filename', type=argparse.FileType('rt'),
                         help='filename to your personal inputs')
     parser.add_argument('--test', '-t', action='store_true')
