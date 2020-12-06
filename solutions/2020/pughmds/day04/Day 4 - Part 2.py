@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[95]:
-
-
 import ast
 from schema import Schema, And, Use, Optional, SchemaError
 import re
-
-
-# In[96]:
 
 
 passportSchema = Schema({
@@ -22,9 +16,6 @@ passportSchema = Schema({
     'pid': And(Use(str), lambda n: validatePid(n)),
     Optional('cid'): And(Use(str))
 })
-
-
-# In[97]:
 
 
 testData = """
@@ -74,9 +65,6 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
 """
 
 validKeys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-
-
-# In[98]:
 
 
 def validateHeight(h):
@@ -138,17 +126,11 @@ def validatePassports(passports):
     return valid
 
 
-# In[99]:
-
-
 # Test Run
 passports = parseBatchFile(testData)
 valid = validatePassports(passports)
         
 print("The number of valid passports is: %d" % len(valid))
-
-
-# In[100]:
 
 
 # Test Run of Invalid Passports
@@ -158,9 +140,6 @@ valid = validatePassports(passports)
 print("The number of valid passports is: %d" % len(valid))
 
 
-# In[101]:
-
-
 # Test Run of Valid Passports
 passports = parseBatchFile(validTestData)
 valid = validatePassports(passports)
@@ -168,23 +147,14 @@ valid = validatePassports(passports)
 print("The number of valid passports is: %d" % len(valid))
 
 
-# In[102]:
-
-
 # Part 1: Real Run
 passports = getAndParseFile("day4.txt")
-
-
-# In[103]:
 
 
 #checkedPassports = checkPassports(passports)
 valid = validatePassports(passports)
         
 print("The number of valid passports is: %d" % len(valid))
-
-
-# In[ ]:
 
 
 

@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
-
-
 testData = """
 abc
 
@@ -21,9 +18,6 @@ a
 
 b
 """
-
-
-# In[3]:
 
 
 def parseData(textInput):
@@ -49,16 +43,10 @@ def countSets(groupData):
     return count
 
 
-# In[4]:
-
-
 #Test Run
 groupData = parseData(testData)
 groupCount = countSets(groupData)
 print("Test Data 'yes' answers: %d " % (groupCount))
-
-
-# In[5]:
 
 
 #Real Run

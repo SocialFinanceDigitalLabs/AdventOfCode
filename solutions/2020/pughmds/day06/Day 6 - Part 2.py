@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 testData = """
 abc
 
@@ -21,9 +18,6 @@ a
 
 b
 """
-
-
-# In[2]:
 
 
 def parseData(textInput):
@@ -55,26 +49,16 @@ def countSets(groupData):
         count += len(g)
     return count
 
-
-# In[3]:
-
-
 #Test Run
 groupData = parseData(testData)
 groupCount = countSets(groupData)
 print("Test Data: whole-group 'yes' answers: %d " % (groupCount))
 
 
-# In[4]:
-
-
 #Real Run
 groupData = openFile("day6.txt")
 groupCount = countSets(groupData)
 print("Live Data: whole-group 'yes' answers: %d " % (groupCount))
-
-
-# In[ ]:
 
 
 

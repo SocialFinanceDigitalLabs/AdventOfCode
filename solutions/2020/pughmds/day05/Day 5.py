@@ -1,18 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 testData = [
     {"code":"FBFBBFFRLR", "seat": 357},
     {"code":"BFFFBBFRRR", "seat": 567},
     {"code":"FFFBBBFRRR", "seat": 119},
     {"code":"BBFFBBFRLL", "seat": 820}
 ]
-
-
-# In[2]:
 
 
 def openData(filename):    
@@ -87,10 +81,6 @@ class Plane:
         return 0
         
 
-
-# In[3]:
-
-
 class Seat:
     def __init__(self, inputData):
         self.rows = self.toBinaryString(inputData[0:7])
@@ -113,26 +103,15 @@ class Seat:
         
 
 
-# In[4]:
-
-
 # Run through some test data:
 testPlane = Plane()
 for item in testData:
     testPlane.validatePlaneSeat(item)
     testPlane.setPlaneSeat(item["code"])
     
-
-
-# In[5]:
-
-
 testPlane.showSeats()
 print("----")
 print(testPlane.getHighestSeat())
-
-
-# In[6]:
 
 
 # Now, we can go through the real data:
@@ -142,9 +121,6 @@ for item in realData:
     realPlane.setPlaneSeat(item)
     
 realPlane.getHighestSeat()
-
-
-# In[8]:
 
 
 mySeatNumber = realPlane.findEmptySeats()

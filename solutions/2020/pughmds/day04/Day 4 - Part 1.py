@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[71]:
-
-
 import ast
-
-
-# In[72]:
 
 
 testData = """
@@ -26,9 +20,6 @@ hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in"""
 
 validKeys = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-
-
-# In[73]:
 
 
 def parseBatchFile(text):
@@ -65,40 +56,18 @@ def checkPassports(passports):
     return passportCount
 
 
-# In[74]:
-
-
 # Test Run
 passports = parseBatchFile(testData)
 
-
-# In[75]:
-
-
 passportCount = checkPassports(passports)
 
-        
 print("The number of valid passports is %d" % (passportCount))
-
-
-# In[77]:
-
 
 # Part 1: Real Run
 passports = getAndParseFile("day4.txt")
 
 
-# In[78]:
-
-
 passportCount = checkPassports(passports)
 
         
 print("The number of valid passports is %d" % (passportCount))
-
-
-# In[ ]:
-
-
-
-

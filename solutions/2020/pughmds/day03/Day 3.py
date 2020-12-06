@@ -1,15 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import re
 import math
-
-
-# In[2]:
-
 
 testSlope = [
     "..##.......",
@@ -29,10 +22,6 @@ startPoint = [0,0]
 runSlope = [[3,1],[1,1],[5,1],[7,1],[1,2]]
 slopeWidth = len(testSlope[0])
 endY = len(testSlope)
-
-
-# In[3]:
-
 
 def getTreeCoordinates(slopeMap):
     treeCoordinates = []
@@ -70,11 +59,6 @@ def splitInput(filename):
 
   return inputStrings
     
-
-
-# In[4]:
-
-
 # Validate test
 
 foundTrees = getTreeCoordinates(testSlope)
@@ -82,10 +66,6 @@ slope = determineSlope(runSlope[0], startPoint)
 runCoordinates = getTobogganRun(slope, endY)
 
 print(countTrees(runCoordinates, foundTrees, slopeWidth))
-
-
-# In[6]:
-
 
 # Part 1 run
 realSlope = splitInput("day3.txt")
@@ -96,10 +76,6 @@ slope = determineSlope(runSlope[0], startPoint)
 runCoordinates = getTobogganRun(slope, endY)
 
 print(countTrees(runCoordinates, foundTrees, slopeWidth))
-
-
-# In[7]:
-
 
 # Part 2 Test Run
 slopeWidth = len(testSlope[0])
@@ -117,9 +93,6 @@ for num, thisRunSlope in enumerate(runSlope):
     treesHit.append(trees)
     
 print("Product of trees hit: %d" % (math.prod(treesHit)))
-
-
-# In[8]:
 
 
 # Part 2 Real run
@@ -141,9 +114,6 @@ for num, thisRunSlope in enumerate(runSlope):
     
 print(treesHit)
 print("Product of trees hit: %d" % (math.prod(treesHit)))
-
-
-# In[ ]:
 
 
 
