@@ -36,20 +36,24 @@ const Part2 = (rulesText, bagToLookFor) => {
 	}
 
 	// Now that we have our structure, we can use recursion to sift through.
-	// Start with a set to store the patterns we find
+	// Part 1 used kind of a bad hybrid recursion. This is fully recursive.
 	function countBags(bagParent, child) {
+		// We need to keep track of the children (how many bags are inside)
 		const children = allBags[child].innerTypes;
+		// And the keys (what bags are inside)
 		const childKeys = Object.keys(children);
+
+		// I had to make this 1 to start with.
 		let thisBags = 1;
 
+		// Only count this bag as there is nothing inside
 		if (children.length === 0) {
-			console.log("Found empty bag");
-			return 1;
+			return 1; 
 		}
 	
 		// Use recursion to look in the bags we've found in the contents
 		for (let i = 0; i < childKeys.length; i++) {
-			console.log("We need " + children[childKeys[i]] + " of the " + childKeys[i] + " bags");
+			// We multiply the number of bags listed, with the number INSIDE those bags
 			thisBags += (children[childKeys[i]] * countBags(bagParent, childKeys[i]));
 		}
 		return thisBags;
@@ -58,8 +62,9 @@ const Part2 = (rulesText, bagToLookFor) => {
 	// Get all the outermost bags to loop over
 	// For part 2, we always start with the shiny gold bag
 
-	let neededBags = countBags(allBags, "shiny gold");
+	let neededBags = countBags(allBags, bagToLookFor);
 	
+	// Because I started with 1, my results were always off by 1.  I could probably do this more elegantly, but I'll just subtract here
 	return neededBags - 1;
 }
 
