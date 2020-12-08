@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+2020/day7/example.txt
+2020/day8/example.txt
