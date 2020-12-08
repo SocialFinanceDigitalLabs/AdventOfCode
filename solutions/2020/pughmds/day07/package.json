@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "mocha": "^8.2.1"
+  },
+  "dependencies": {
+    "require-text": "^0.0.1"
+  }
+}
