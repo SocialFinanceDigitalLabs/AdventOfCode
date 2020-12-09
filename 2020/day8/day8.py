@@ -20,15 +20,9 @@ def to_next(data, i=0, accumulator=0):
         i += 1
     elif action == 'acc':
         i += 1
-        if increment[0] == '+':
-            accumulator += int(increment[1:])
-        else:
-            accumulator -= int(increment[1:])
+        accumulator += int(increment)
     else:
-        if increment[0] == '+':
-            i += int(increment[1:])
-        else:
-            i -= int(increment[1:])
+        i += int(increment)
     return i, accumulator
 
 assert to_next(puzzle, i=0, accumulator=0) == (232, 0)
