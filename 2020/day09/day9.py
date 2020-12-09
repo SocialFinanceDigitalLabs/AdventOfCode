@@ -9,11 +9,6 @@ import itertools
 
 with open('input_day9.txt', 'r') as file:
     puzzle = [int(x.strip()) for x in file]
-    
-with open('example.txt', 'r') as file:
-    example = [int(x.strip()) for x in file]
-    
-print(puzzle[:10])
 
 
 # Part 1
