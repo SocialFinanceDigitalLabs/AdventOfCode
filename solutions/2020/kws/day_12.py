@@ -107,7 +107,7 @@ class WayPointNavigator:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Day 10 of Advent of Code 2020')
+    parser = argparse.ArgumentParser(description='Day 12 of Advent of Code 2020')
     parser.add_argument('file', metavar='filename', type=argparse.FileType('rt'),
                         help='filename to your personal inputs')
     parser.add_argument('--debug', '-d', action='store_true', help='Print debug output of maps')
