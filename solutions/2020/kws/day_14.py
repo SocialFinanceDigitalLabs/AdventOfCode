@@ -74,6 +74,48 @@ def apply_mask(mask, value):
     return int_value
 
 
+def apply_insane_floating_mask(mask, value):
+    """
+
+    >>> apply_insane_floating_mask("00", 0)
+    {0}
+
+    >>> apply_insane_floating_mask("11", 0)
+    {3}
+
+    >>> apply_insane_floating_mask("XX", 0)
+    {0, 1, 2, 3}
+
+    >>> apply_insane_floating_mask("X1", 0)
+    {1, 3}
+
+    >>> apply_insane_floating_mask("000000000000000000000000000000X1001X", 42)
+    {58, 59, 26, 27}
+
+    :param mask:
+    :param value:
+    :return:
+    """
+
+    if isinstance(value, str):
+        int_value = int(value, 2)
+    else:
+        int_value = value
+
+    int_value |= get_ones_mask(mask)
+
+    possible_values = {int_value, }
+    for ix, v in enumerate(mask[::-1]):
+        if v == "X":
+            bit = ix
+            values_0 = {v & ~(2**bit) for v in possible_values}
+            values_1 = {v | (2**bit) for v in possible_values}
+            possible_values |= values_0
+            possible_values |= values_1
+
+    return possible_values
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Day 14 of Advent of Code 2020')
     parser.add_argument('file', metavar='filename', type=argparse.FileType('rt'), nargs="?",
@@ -104,6 +146,23 @@ if __name__ == "__main__":
 
                 output_value = apply_mask(mask, int(value))
                 memory[address] = output_value
+
+        print(memory)
+        print(sum(memory.values()))
+
+        mask=''
+        memory={}
+        for line in input_lines:
+            if "mask" in line:
+                mask = line.split("=")[1].strip()
+            else:
+                m = re.match(r"mem\[(\d+)\] = (\d+)", line)
+                address = int(m.group(1))
+                value = int(m.group(2))
+
+                addresses = apply_insane_floating_mask(mask, address)
+                for a in addresses:
+                    memory[a] = value
 
         print(memory)
         print(sum(memory.values()))
