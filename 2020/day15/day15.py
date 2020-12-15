@@ -26,4 +26,4 @@ def nth_number(data, n):
     return last
 
 
-print(nth_number(puzzle, 2020))    
+print(nth_number(puzzle, 30000000))    
