@@ -41,13 +41,13 @@ def countSumChanges(data):
     return total
 
 
-#Test with sample data
-with open("input.txt", 'r') as fileStream:
-    fileText = fileStream.read()
-    inputStrings = fileText.split('\n')
-    taskData = list(map(int, inputStrings))
-
 if __name__ == '__main__':
+    # Test with sample data
+    with open("input.txt", 'r') as fileStream:
+        fileText = fileStream.read()
+        inputStrings = fileText.split('\n')
+        taskData = list(map(int, inputStrings))
+
     result = countChanges(taskData)
     print("----PART 1-----")
     print(result)
