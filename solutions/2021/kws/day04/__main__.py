@@ -1,11 +1,9 @@
-import sys
-from common import standard_args, file_to_lines
+from common import standard_setup
 import day04
 
 
 def main(*argv):
-    args = standard_args(4, *argv)
-    lines = file_to_lines(args.filename)
+    lines = standard_setup(*argv)
 
     numbers, boards = day04.parse_input(lines)
     board_dimension = boards[0].rows.shape[0]
@@ -39,4 +37,4 @@ def main(*argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()

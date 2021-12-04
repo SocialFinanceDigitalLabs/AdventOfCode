@@ -1,8 +1,5 @@
 import unittest
-from pathlib import Path
-
 import day04
-from common import file_to_lines
 from day04 import Board
 
 
