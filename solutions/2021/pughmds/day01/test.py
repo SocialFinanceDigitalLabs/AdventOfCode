@@ -15,14 +15,14 @@ sample1 = [
 
 class TestFirst(TestCase):
     def test_sample(self):
-        from task import countChanges
+        from main import countChanges
         result = countChanges(sample1)
         print(result)
         self.assertEqual(result["increase"], 7)
 
 class TestSecond(TestCase):
     def test_sample(self):
-        from task import countSumChanges
+        from main import countSumChanges
         result = countSumChanges(sample1)
         print(result)
         self.assertEqual(result["increase"], 5)
