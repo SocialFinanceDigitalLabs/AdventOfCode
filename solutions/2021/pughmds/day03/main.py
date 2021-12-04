@@ -1,51 +1,85 @@
+def getBitCount(values):
+    initial = [0] * len(values[0])
 
-def parseInput(inputStrings):
-    commands = []
-    for i in inputStrings:
-        c = {}
-        tmp = i.split(" ")
-        c["command"] = tmp[0]
-        c["distance"] = int(tmp[1])
-        commands.append(c)
-    return commands
+    for v in values:
+        for idx, pos in enumerate(v):
+            initial[idx] += int(pos)
 
-def traceDirectionsV1(commands, position):
-    for c in commands:
-        if c["command"] == "down":
-            position["depth"] += c["distance"]
-        elif c["command"] == "forward":
-            position["horizontal"] += c["distance"]
-        elif c["command"] == "up":
-            position["depth"] -= c["distance"]
-    return position
+    return initial
 
-def traceDirectionsV2(commands, position):
-    for c in commands:
-        if c["command"] == "down":
-            position["aim"] += c["distance"]
-        elif c["command"] == "forward":
-            position["horizontal"] += c["distance"]
-            position["depth"] += (c["distance"] * position["aim"])
-        elif c["command"] == "up":
-            position["aim"] -= c["distance"]
-    return position
+def getGammaRate(values):
+    valueCount = len(values)
+    initial = getBitCount(values)
+
+    for idx, v in enumerate(initial):
+        if v >= (valueCount / 2):
+            initial[idx] = '1'
+        else:
+            initial[idx] = '0'
+
+    return ''.join(initial)
+
+def getEpsilonRate(gammaRate):
+    return gammaRate.replace('1', '2').replace('0', '1').replace('2', '0')
+
+def getPowerConsumptionFromRates(gammaRate, epsilonRate):
+    g = int(gammaRate, 2)
+    e = int(epsilonRate, 2)
+    return g * e
+
+def getPowerConsumption(values):
+    gamma = getGammaRate(values)
+    epsilon = getEpsilonRate(gamma)
+    power = getPowerConsumptionFromRates(gamma, epsilon)
+    return power
+
+def getO2Rating(values):
+    pointer = 0
+    while len(values) > 1:
+        gamma = getGammaRate(values)
+        values = [x for x in values if x[pointer] == gamma[pointer]]
+        if len(values) == 1:
+            return values[0]
+        elif len(values) == 0:
+            return None
+        else:
+            pointer += 1
+    return values
+
+def getCO2Rating(values):
+    pointer = 0
+    while len(values) > 1:
+        print(values)
+        gamma = getGammaRate(values)
+        epsilon = getEpsilonRate(gamma)
+        print("--> {}".format(epsilon))
+        values = [x for x in values if x[pointer] == epsilon[pointer]]
+        if len(values) == 1:
+            return values[0]
+        elif len(values) == 0:
+            return None
+        else:
+            pointer += 1
+    return values
+
+def getLifeSupportRating(values):
+    o2rating = getO2Rating(values)
+    co2rating = getCO2Rating(values)
+    return int(o2rating, 2) * int(co2rating, 2)
 
 if __name__ == '__main__':
-    position = {"horizontal": 0, "depth": 0, "aim": 0}
-    # Test with sample data
+    result = {"gamma": "", "epsilon": ""}
+
     with open("input.txt", 'r') as fileStream:
         fileText = fileStream.read()
         inputStrings = fileText.split('\n')
 
-    commands = parseInput(inputStrings)
+
     print("----PART 1-----")
-    position = traceDirectionsV1(commands, position)
-    print(position)
-    print("Check: {}".format(position["horizontal"] * position["depth"]))
+    power = getPowerConsumption(inputStrings)
+    print(power)
 
 
     print("----PART 2-----")
-    position = {"horizontal": 0, "depth": 0, "aim": 0}
-    position = traceDirectionsV2(commands, position)
-    print(position)
-    print("Check: {}".format(position["horizontal"] * position["depth"]))
+    lifeSupport = getLifeSupportRating(inputStrings)
+    print(lifeSupport)
