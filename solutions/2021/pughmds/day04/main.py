@@ -48,7 +48,7 @@ def runGameV2(numbers, boards):
 
 def parseInput(inputStrings, boardHeight):
     '''
-    Separating out the first line as input numbers, and then handling thbe rest as bingo boards
+    Separating out the first line as input numbers, and then handling the rest as bingo boards
     '''
     for idx, item in enumerate(inputStrings):
         inputStrings[idx] = item.replace("  ", " ")
