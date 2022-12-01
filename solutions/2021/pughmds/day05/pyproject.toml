@@ -1,11 +1,12 @@
 [tool.poetry]
-name = "day03"
+name = "day05"
 version = "0.1.0"
 description = ""
 authors = ["Matthew Pugh <pughmds@cyram.org>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+bresenham = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 unittest = "^0.0"
