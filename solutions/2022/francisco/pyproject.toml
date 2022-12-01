@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "2021"
+version = "0.1.0"
+description = ""
+authors = ["Francisco Macedo <franciscovcbm@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = "^0.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
