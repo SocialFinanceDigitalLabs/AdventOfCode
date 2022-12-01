@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "adventofcode"
+version = "0.1.0"
+description = ""
+authors = ["patrick-troy <58770937+patrick-troy@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^1.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
