@@ -7,7 +7,7 @@ YOUR_MOVES = ["X", "Y", "Z"]
 
 def get_shape_score(move):
     """
-    Determine the move's score
+    Determine the move's score (not if you win or lose)
     """
     if move == "A" or move == "X":
         # Rock
@@ -22,7 +22,7 @@ def get_shape_score(move):
 
 def get_game_score(op_move, your_move):
     """
-    Determine the score by the move itself (not if you win or lose)
+    Determine the score by the move
     """
     if OP_MOVES.index(op_move) == YOUR_MOVES.index(your_move):
         # A tie
