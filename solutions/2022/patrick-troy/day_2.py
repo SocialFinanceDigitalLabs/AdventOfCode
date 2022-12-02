@@ -39,13 +39,13 @@ points = 0
 secret_combo = {"X": "lose", "Y": "draw", "Z": "win"}
 
 for combination in data:
-    if combination[2] == "X":
+    if secret_combo[combination[2]] == "lose":
         points += lose
         points += lose_combo[combination[0]]
-    if combination[2] == "Y":
+    if secret_combo[combination[2]] == "draw":
         points += draw
         points += draw_combo[combination[0]]
-    elif combination[2] == "Z":
+    elif secret_combo[combination[2]] == "win":
         points += win
         points += win_combo[combination[0]]
 
