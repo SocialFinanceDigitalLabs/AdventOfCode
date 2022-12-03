@@ -47,7 +47,7 @@ def show_test_results(result, expected_result, test_name):
         print("               ╔════════╗")
         print(" ╔═════════════╝ {} ╚═════════════".format(test_name))
         print(" ║ Test PASSED")
-        print(" ║ Expected {}, got {} ".format(result, expected_result))
+        print(" ║ Expected {}, got {} ".format(expected_result, result))
         print(" ╚════════════════════════════════════")
     except AssertionError:
         print("               ╔════════╗")
