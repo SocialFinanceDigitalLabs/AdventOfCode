@@ -1,3 +1,17 @@
+import pandas as pd
+import string
+
+lowercase = list(string.ascii_lowercase)
+small_weights = list(range(1, 27))
+small_priorities = dict(zip(lowercase, small_weights))
+
+uppercase = list(string.ascii_uppercase)
+upper_weights = list(range(27, 53))
+upper_priorities = dict(zip(uppercase, upper_weights))
+
+priorities_map = small_priorities | upper_priorities
+
+
 def string_in_two(strng):
     """divide a string into two equal parts"""
     first_part = strng[: len(strng) // 2]
