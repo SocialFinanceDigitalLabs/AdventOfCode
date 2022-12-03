@@ -7,11 +7,7 @@ for items in rucksacks:
     compartment_split = int(len(items)/2)
     half_1 = items[:compartment_split]
     half_2 = items[compartment_split:]
-    matches = []
-    for item in half_1:
-        if item in half_2:
-            matches.append(item)
-    unique_matches = set(matches)
+    unique_matches = set(half_1) & set(half_2)
     match = next(iter(unique_matches))
     total += ord(match)-38 if match.isupper() else ord(match)-96
 
