@@ -31,7 +31,7 @@ def split_list_into_chunks(bag_contents, chunk_size):
     Takes a list of items and groups them into chunks of equal size
     """
     for i in range(0, len(bag_contents), chunk_size):
-        yield bag_contents[i : i + chunk_size]
+        yield bag_contents[i: i + chunk_size]
 
 
 def find_badge(group):

@@ -17,6 +17,7 @@ def run(data):
     max_calories = 0
     calories = 0
     for item in data:
+        item = item.strip()
         if item != "":
             calories += int(item)
         else:
@@ -35,6 +36,7 @@ def run_p2(data):
     calorie_list = []
     calories = 0
     for item in data:
+        item = item.strip()
         if item != "":
             calories += int(item)
         else:
