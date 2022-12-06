@@ -1,5 +1,5 @@
-EXPECTED_TEST_ANSWER_PART1 = 2
-EXPECTED_TEST_ANSWER_PART2 = 4
+EXPECTED_TEST_ANSWER_PART1 = [2]
+EXPECTED_TEST_ANSWER_PART2 = [4]
 
 
 def generate_assignment_boundaries(assignment):
