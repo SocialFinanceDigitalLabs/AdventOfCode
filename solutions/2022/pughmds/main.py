@@ -2,8 +2,10 @@ import click
 import importlib
 from shared.file import open_into_list
 from shared.output import show_results, show_test_results
-from shared.test import run_tests
-
+from shared.test import display_test_results
+from shared.exec import create_result
+import glob
+import re
 
 @click.command()
 @click.option("--day", default=1, help="Which Day To Run")
@@ -15,46 +17,38 @@ def run(day, test, part1, part2):
     module = importlib.import_module(f"{day}.__main__")
 
     if test:
-        input_file_location = f"{day}/test.txt"
+        input_file_locations = glob.glob(f"{day}/test*.txt")
     else:
-        input_file_location = f"{day}/input.txt"
+        input_file_locations = [f"{day}/input.txt"]
 
-    input_file = open_into_list(input_file_location)
+    results = []
+    for file in input_file_locations:
+        input_file_data = open_into_list(file)
+        if test:
+            testnum = int(re.findall(r'\d+', file)[-1]) - 1
+        else:
+            testnum = 0
 
-    if part1:
-        results = [
-            {
-                "Part": "Part 1",
-                "Value": module.run(input_file),
-                "Expected": module.EXPECTED_TEST_ANSWER_PART1,
-            }
-        ]
-    elif part2:
-        results = [
-            {
-                "Part": "Part 2",
-                "Value": module.run_p2(input_file),
-                "Expected": module.EXPECTED_TEST_ANSWER_PART2,
-            }
-        ]
-    else:
-        results = [
-            {
-                "Part": "Part 1",
-                "Value": module.run(input_file),
-                "Expected": module.EXPECTED_TEST_ANSWER_PART1,
-            },
-            {
-                "Part": "Part 2",
-                "Value": module.run_p2(input_file),
-                "Expected": module.EXPECTED_TEST_ANSWER_PART2,
-            },
-        ]
+        if part1:
+            res = create_result(1, module.EXPECTED_TEST_ANSWER_PART1[testnum])
+            res["Value"] = module.run(input_file_data)
+            results.append(res)
+        elif part2:
+            res = create_result(2, module.EXPECTED_TEST_ANSWER_PART2[testnum])
+            res["Value"] = module.run_p2(input_file_data)
+            results.append(res)
+        else:
+            res = create_result(1, module.EXPECTED_TEST_ANSWER_PART1[testnum])
+            res["Value"] = module.run(input_file_data)
+            results.append(res)
+            res = create_result(2, module.EXPECTED_TEST_ANSWER_PART2[testnum])
+            res["Value"] = module.run_p2(input_file_data)
+            results.append(res)
 
     show_results(results, day)
 
     if test:
-        run_tests(results)
+        display_test_results(results)
 
 
 if __name__ == "__main__":
