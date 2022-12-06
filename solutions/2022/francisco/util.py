@@ -56,7 +56,7 @@ def new_day(day: int):
     with open(f"{day_dir}/STATEMENT.md", "w") as f:
         f.write(markdownify(statement))
 
-def submit_answer(day: int, answer: int, part: int = 1) -> bool:
+def submit_answer(day: int, answer: int | str, part: int = 1) -> bool:
     res = requests.post(
         f"https://adventofcode.com/2022/day/{day}/answer",
         cookies={"session": AOC_COOKIE},
