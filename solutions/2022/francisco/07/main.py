@@ -28,8 +28,7 @@ class Node:
 
 
 class FileSystem:
-    def __init__(self, commands: list[str]) -> None:
-        self.commands = commands
+    def __init__(self) -> None:
         self.nodes: dict[int, Node] = {
             0: Node(node_type=NodeType.DIR, name="/", parent=None)
         }
@@ -66,7 +65,7 @@ class FileSystem:
     def apply_command(self, command: str):
         _command = command.split("$")[-1].strip()
         try:
-            cmd, dest = _command.split(" ")
+            _, dest = _command.split(" ")
         except ValueError:
             # in case it's ls, we dont do nothing
             return
@@ -85,8 +84,8 @@ class FileSystem:
         id = self.create_node(dest, node_type=NodeType.DIR)
         self.current_pos = id
 
-    def fill_nodes(self):
-        for entry in self.commands:
+    def fill_nodes(self, commands: list[str]):
+        for entry in commands:
             if self.is_command(entry):
                 self.apply_command(entry)
             else:
@@ -116,8 +115,8 @@ def part_1(file: str):
     """should return the solution"""
     parser = FileParser(dir_path, file)
     commands = parser.read()
-    file_system = FileSystem(commands)
-    file_system.fill_nodes()
+    file_system = FileSystem()
+    file_system.fill_nodes(commands)
     return file_system.calculate_dirs_size()
 
 
@@ -125,6 +124,6 @@ def part_2(file: str):
     """should return the solution"""
     parser = FileParser(dir_path, file)
     commands = parser.read()
-    file_system = FileSystem(commands)
-    file_system.fill_nodes()
+    file_system = FileSystem()
+    file_system.fill_nodes(commands)
     return file_system.find_smallest_dir_to_delete()
