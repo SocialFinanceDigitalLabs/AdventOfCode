@@ -6,6 +6,7 @@ EXPECTED_TEST_ANSWER_PART2 = [8]
 
 class Forest:
     """Stores the forest we're looking at in a grid"""
+
     def __init__(self):
         self.grid = []
 
@@ -73,13 +74,17 @@ class Forest:
 
                 line_of_sight = [
                     self.get_tree_line_heights(xidx, yidx - 1, xidx - 1, -1),
-                    self.get_tree_line_heights(xidx, yidx + 1, xidx + 1, len(self.grid)),
+                    self.get_tree_line_heights(
+                        xidx, yidx + 1, xidx + 1, len(self.grid)
+                    ),
                     left,
-                    self.get_tree_line_heights(xidx + 1, yidx, len(row), yidx + 1)
+                    self.get_tree_line_heights(xidx + 1, yidx, len(row), yidx + 1),
                 ]
 
                 for idx, direction in enumerate(distance):
-                    distance[idx] = self.adjust_viewing_distance(tree, line_of_sight[idx])
+                    distance[idx] = self.adjust_viewing_distance(
+                        tree, line_of_sight[idx]
+                    )
 
                 tree.view_distance = distance
 
@@ -109,9 +114,11 @@ class Forest:
                 # Test if it can get past all of them to the outside.
                 line_of_sight = [
                     self.get_tree_line_heights(xidx, yidx - 1, xidx - 1, -1),
-                    self.get_tree_line_heights(xidx, yidx + 1, xidx + 1, len(self.grid)),
+                    self.get_tree_line_heights(
+                        xidx, yidx + 1, xidx + 1, len(self.grid)
+                    ),
                     self.get_tree_line_heights(0, yidx, xidx, yidx + 1),
-                    self.get_tree_line_heights(xidx + 1, yidx, len(row), yidx + 1)
+                    self.get_tree_line_heights(xidx + 1, yidx, len(row), yidx + 1),
                 ]
                 for line in line_of_sight:
                     if all(tree.height > x for x in line):
@@ -152,7 +159,7 @@ class Forest:
         all the recorded heights. Useful in debugging.
         """
         for row in self.grid:
-            print(''.join([str(tree.height) for tree in row]))
+            print("".join([str(tree.height) for tree in row]))
         return
 
     def show_visibility(self):
@@ -161,7 +168,7 @@ class Forest:
         all trees in the forest. Useful when debugging.
         """
         for row in self.grid:
-            print(''.join([tree.get_visibility() for tree in row]))
+            print("".join([tree.get_visibility() for tree in row]))
         return
 
     def show_view(self):
@@ -171,7 +178,14 @@ class Forest:
         [Up,Down,Left,Right] for each tree in the forest.
         """
         for row in self.grid:
-            print('\t'.join([''.join([str(item) for item in tree.view_distance]) for tree in row]))
+            print(
+                "\t".join(
+                    [
+                        "".join([str(item) for item in tree.view_distance])
+                        for tree in row
+                    ]
+                )
+            )
         return
 
 
@@ -180,6 +194,7 @@ class Point:
     Stores information about a given point (e.g. tree)
     in the forest
     """
+
     def __init__(self, height):
         self.height = height
         self.visible = False
