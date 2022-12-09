@@ -944,7 +944,7 @@ $ ls
 105827 ndzjnttr
 140925 nmnr.lct
 dir rlf
-238998 tprth.gjn
+238998 tprth.gjngit 
 dir vrdrsj
 $ cd rlf
 $ ls
