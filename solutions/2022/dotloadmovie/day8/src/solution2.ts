@@ -108,10 +108,6 @@ export const solution2 = () => {
       }
     });
 
-    if (x === 15 && y === 52) {
-      console.log(blocking, values, x, y);
-    }
-
     const count = values.reduce((acc: number, curr: number) => {
       return acc * curr;
     });
@@ -127,13 +123,9 @@ export const solution2 = () => {
     });
   });
 
-  //  console.log(getViewingDistances(15, 52));
-
   const response = outputs.sort((a: any, b: any) => {
     return b.total - a.total;
   })[0];
-
-  console.log(response);
 
   return response.total;
 };

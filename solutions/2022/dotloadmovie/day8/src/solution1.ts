@@ -67,8 +67,6 @@ export const solution1 = () => {
       blocking.below.push(grid[below][x]);
     }
 
-    console.log(blocking, `--> ${element}, ${x}, ${y}`);
-
     const hiddenAbove =
       blocking.above.filter((tree) => {
         return tree >= element;
