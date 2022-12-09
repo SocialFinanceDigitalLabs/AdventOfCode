@@ -49,8 +49,12 @@ class Folder:
 
 @main.command()
 @click.option("--sample", "-s", is_flag=True)
-def day07(sample):
-    if sample:
+@click.option("--input", "-i", "input_file", type=click.File("rt"))
+def day07(sample, input_file):
+    assert not (sample and input_file), "Only one of sample or input_file can be set"
+    if input_file:
+        input_data = input_file.read()
+    elif sample:
         input_data = (config.SAMPLE_DIR / "day07.txt").read_text()
     else:
         input_data = (config.USER_DIR / "day07.txt").read_text()
