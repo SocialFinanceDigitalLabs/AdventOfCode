@@ -1,0 +1,12 @@
+addx 15
+addx -11
+addx 6
+noop
+noop
+addx 5
+addx -1
+addx -8
+addx 13
+addx 4
+addx -1
+noop

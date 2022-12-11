@@ -36,7 +36,7 @@ if __name__ == "__main__":
     main()
 
 """)
-write_text_to_file(path / "sample_input.txt", "")
+write_text_to_file(path / "input_sample.txt", "")
 
 write_text_to_file(f"tests/test_day{args.day:02d}.py", f"""# Advent of Code 2021 Day {args.day}
 import unittest
