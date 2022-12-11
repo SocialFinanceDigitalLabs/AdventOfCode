@@ -23,3 +23,5 @@ def main(user):
 for name in Path(__file__).parent.glob("day*.py"):
     module = name.stem
     mod = importlib.import_module(f"aoc_2022_kws.{module}")
+
+mod = importlib.import_module(f"aoc_2022_kws.setup")
