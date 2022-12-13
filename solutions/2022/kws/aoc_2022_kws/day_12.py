@@ -1,6 +1,11 @@
 from collections import namedtuple
 from typing import Dict, List, NamedTuple
 
+import click
+from aoc_2022_kws.cli import main
+from aoc_2022_kws.config import config
+from aocd import submit
+
 
 class Coordinate(NamedTuple):
     x: int
@@ -43,9 +48,13 @@ def dijkstra(graph: Dict[Point, List[Point]], source: Point):
     return distances
 
 
-def day12():
-    with open("input.txt") as file:
-        input_data = [line.replace("\n", " ") for line in file]
+@main.command()
+@click.option("--sample", "-s", is_flag=True)
+def day12(sample):
+    if sample:
+        input_data = (config.SAMPLE_DIR / "day12.txt").read_text()
+    else:
+        input_data = (config.USER_DIR / "day12.txt").read_text()
 
     terrain_map = {}
     neighbour_map = {}
@@ -53,7 +62,7 @@ def day12():
     end: Point = None
 
     # parse the input data
-    for y, line in enumerate(input_data):
+    for y, line in enumerate(input_data.splitlines()):
         for x, char in enumerate(line):
             coord = Coordinate(x, y)
             point = Point(coord, char)
@@ -102,5 +111,4 @@ def day12():
 
 
 if __name__ == "__main__":
-    print("hi")
     day12()
