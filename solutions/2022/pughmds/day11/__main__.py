@@ -50,7 +50,9 @@ class Monkey:
         the numbers and preventing the numbers from getting too large
         """
         for idx, item in enumerate(self.holding_items):
-            self.holding_items[idx] = (item // self.worry_reduction_factor) % self.safe_divisor
+            self.holding_items[idx] = (
+                item // self.worry_reduction_factor
+            ) % self.safe_divisor
 
     def pass_to_next_monkey(self):
         """
@@ -76,7 +78,9 @@ def parse_instructions(data, worry_reduction_factor):
         if entry.startswith("Monkey"):
             m = Monkey(fake.first_name(), worry_reduction_factor)
         elif entry.strip().startswith("Starting items"):
-            m.holding_items = [int(word) for word in entry.replace(",", " ").split() if word.isdigit()]
+            m.holding_items = [
+                int(word) for word in entry.replace(",", " ").split() if word.isdigit()
+            ]
         elif entry.strip().startswith("Operation"):
             op = entry.split("=")[-1].strip().split()
             if op[2].isnumeric():
@@ -116,43 +120,52 @@ def set_safe_divisor(monkeys):
     for m in monkeys:
         m.safe_divisor = divisor
 
-def show_monkey_handling(round, monkeys):
+
+def show_monkey_handling(passing_round, monkeys):
     """
     Debug function to help show what the status was during the puzzle
     loops to help figure out where problems were when I wasn't getting
     the right answer
     """
     print("-------------------------------")
-    print("At the start of round {}", round)
+    print("At the start of passing round {}", passing_round)
     print("-------------------------------")
     for idx, m in enumerate(monkeys):
-        print("Monkey #{} (AKA: {}) has {} items, and inspected {} times".format(idx, m.name, m.holding_items, m.inspection_count))
+        print(
+            "Monkey #{} (AKA: {}) has {} items, and inspected {} times".format(
+                idx, m.name, m.holding_items, m.inspection_count
+            )
+        )
 
 
 def run(data):
     monkeys = parse_instructions(data, 3)
     set_safe_divisor(monkeys)
-    for round in range(0, 20):
-        if round % 2 == 0:
-            show_monkey_handling(round, monkeys)
+    for passing_round in range(0, 20):
+        if passing_round % 2 == 0:
+            show_monkey_handling(passing_round, monkeys)
         for m in monkeys:
             m.take_turn()
             where_to_pass = m.pass_to_next_monkey()
             for pass_instruction in where_to_pass:
-                monkeys[pass_instruction["to_monkey"]].holding_items.append(pass_instruction["item"])
+                monkeys[pass_instruction["to_monkey"]].holding_items.append(
+                    pass_instruction["item"]
+                )
     return get_score(monkeys)
 
 
 def run_p2(data):
     monkeys = parse_instructions(data, 1)
     set_safe_divisor(monkeys)
-    for round in range(0, 10000):
-        if round % 1000 == 0:
-            show_monkey_handling(round, monkeys)
+    for passing_round in range(0, 10000):
+        if passing_round % 1000 == 0:
+            show_monkey_handling(passing_round, monkeys)
         for m in monkeys:
             m.take_turn()
             where_to_pass = m.pass_to_next_monkey()
             for pass_instruction in where_to_pass:
-                monkeys[pass_instruction["to_monkey"]].holding_items.append(pass_instruction["item"])
+                monkeys[pass_instruction["to_monkey"]].holding_items.append(
+                    pass_instruction["item"]
+                )
 
     return get_score(monkeys)
