@@ -31,10 +31,10 @@ def test_registry(sample1):
     AA = valve_registry.AA
     assert AA.rate == 0
 
-    assert valve_registry.graph[AA] == [
+    assert valve_registry.graph[AA] == (
         GraphNode(valve_registry.BB, 1),
         GraphNode(valve_registry.CC, 1),
-    ]
+    )
 
 
 def test_dijkstra(sample1):
@@ -65,7 +65,7 @@ def test_simplify_graph(sample1):
     graph = valve_registry.graph
 
     assert len(graph) == 3
-    assert graph[valve_registry.BB] == [GraphNode(valve_registry.AA, 1)]
+    assert graph[valve_registry.BB] == (GraphNode(valve_registry.AA, 1),)
 
     distances = dijkstra(graph, valve_registry.BB)
     assert distances[valve_registry.AA] == 1
@@ -74,7 +74,7 @@ def test_simplify_graph(sample1):
     simple_graph = simplify_graph(graph, {})
 
     assert len(simple_graph) == 2
-    assert simple_graph[valve_registry.BB] == [GraphNode(valve_registry.CC, 2)]
+    assert simple_graph[valve_registry.BB] == (GraphNode(valve_registry.CC, 2),)
 
     distances = dijkstra(simple_graph, valve_registry.BB)
     assert valve_registry.AA not in distances
@@ -96,17 +96,17 @@ Valve AD has flow rate=2; tunnels lead to valves AA
     simple_graph = simplify_graph(graph, {})
 
     assert len(simple_graph) == 2
-    assert simple_graph[valve_registry.BC] == [GraphNode(valve_registry.AD, 3)]
-    assert simple_graph[valve_registry.AD] == [GraphNode(valve_registry.BC, 3)]
+    assert simple_graph[valve_registry.BC] == (GraphNode(valve_registry.AD, 3),)
+    assert simple_graph[valve_registry.AD] == (GraphNode(valve_registry.BC, 3),)
 
     simple_graph_with_origin = simplify_graph(graph, {}, keep=valve_registry.AA)
     assert len(simple_graph_with_origin) == 3
-    assert simple_graph_with_origin[valve_registry.BC] == [
-        GraphNode(valve_registry.AA, 2)
-    ]
-    assert simple_graph_with_origin[valve_registry.AD] == [
-        GraphNode(valve_registry.AA, 1)
-    ]
+    assert simple_graph_with_origin[valve_registry.BC] == (
+        GraphNode(valve_registry.AA, 2),
+    )
+    assert simple_graph_with_origin[valve_registry.AD] == (
+        GraphNode(valve_registry.AA, 1),
+    )
 
 
 def test_simplify_graph_from_puzzle(sample_puzzle):
@@ -114,12 +114,12 @@ def test_simplify_graph_from_puzzle(sample_puzzle):
     graph = valve_registry.graph
 
     assert len(graph) == 10
-    assert graph[valve_registry.HH] == [GraphNode(valve_registry.GG, 1)]
+    assert graph[valve_registry.HH] == (GraphNode(valve_registry.GG, 1),)
 
     simple_graph = simplify_graph(graph, {})
 
     assert len(simple_graph) == 6
-    assert simple_graph[valve_registry.HH] == [GraphNode(valve_registry.EE, 3)]
+    assert simple_graph[valve_registry.HH] == (GraphNode(valve_registry.EE, 3),)
 
     distances = dijkstra(graph, valve_registry.HH)
     assert distances[valve_registry.JJ] == 7
