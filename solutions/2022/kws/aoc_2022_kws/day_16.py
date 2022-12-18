@@ -143,6 +143,10 @@ def get_score(path):
     return sum(v.rate * t for v, t in path)
 
 
+def get_valves(path):
+    return tuple(sorted([v for v, _ in path], key=lambda v: v.name))
+
+
 def score_paths(paths):
     for p in paths:
         path_name = "->".join(v.name for v, _ in p)
@@ -182,6 +186,9 @@ def day16(sample):
     for path_name, score in scored_paths[-5:]:
         print(score, path_name)
 
+    print("Part 1:", scored_paths[-1][1])
+    print()
+
     # Part 2
 
     p2_paths = []
@@ -191,25 +198,26 @@ def day16(sample):
                 distances, active_valves, {valve}, valve, 26 - aa_distances[valve]
             )
         )
-
     print("Calculated paths")
-    p2_paths = sorted(p2_paths, key=lambda p: len(p))
-    print("Sorted paths")
 
-    max_score = -float("inf")
-    best_path = None
-    for my_ix, my_path in enumerate(track(p2_paths)):
-        my_valves = {v for v, _ in my_path}
-        for el_path in p2_paths[my_ix + 1 :]:
-            el_valves = {v for v, _ in el_path}
-            if not my_valves & el_valves:
-                combined_path = my_path + el_path
-                score = sum(v.rate * t for v, t in combined_path)
-                if score > max_score:
-                    max_score = score
-                    best_path = combined_path
-                    print(
-                        "New best", max_score, "->".join(v.name for v, _ in best_path)
-                    )
+    p2_paths = list((get_valves(p), get_score(p)) for p in p2_paths)
+    p2_paths.sort(key=lambda p: p[1], reverse=True)
+    print("Sorted paths", len(p2_paths))
 
-    print("Combined paths", max_score, best_path)
+    highest_scoring_paths = {}
+    for valves, score in p2_paths:
+        if score > highest_scoring_paths.get(valves, 0):
+            highest_scoring_paths[valves] = score
+
+    print("Indexed paths", len(highest_scoring_paths))
+
+    candidates = []
+    for valves, score in highest_scoring_paths.items():
+        # target_valves = active_valves - valves
+        for v2, s2 in highest_scoring_paths.items():
+            if not set(valves) & set(v2):
+                candidates.append((valves + v2, score + s2))
+
+    candidates.sort(key=lambda p: p[1])
+    for valves, score in candidates[-10:]:
+        print(score, "->".join(v.name for v in valves))
