@@ -1,4 +1,6 @@
 import re
+from collections import Counter
+from functools import lru_cache
 from typing import Dict, Iterable, Iterator, List, Mapping, NamedTuple, Tuple
 
 import click
@@ -20,18 +22,29 @@ class GraphNode(NamedTuple):
     distance: int
 
 
-class Graph(Mapping[Valve, List[GraphNode]]):
-    def __init__(self, graph: Mapping[Valve, List[GraphNode]]):
-        self._graph = {**graph}
+class Graph(Mapping[Valve, Tuple[GraphNode]]):
+    def __init__(self, graph: Mapping[Valve, Iterable[GraphNode]]):
+        self._graph = [
+            (k, tuple(v1 for v1 in sorted(v, key=lambda v1: v1.valve.name)))
+            for k, v in graph.items()
+        ]
+        self._graph = tuple(sorted(self._graph, key=lambda v: v[0].name))
 
-    def __getitem__(self, item: Valve) -> List[GraphNode]:
-        return self._graph[item]
+    @lru_cache
+    def __getitem__(self, item: Valve) -> Tuple[GraphNode]:
+        return next(v[1] for v in self._graph if v[0] == item)
 
     def __iter__(self) -> Iterator[Valve]:
-        return iter(self._graph)
+        return iter([item[0] for item in self._graph])
 
     def __len__(self) -> int:
         return len(self._graph)
+
+    def __hash__(self):
+        return hash(self._graph)
+
+    def __eq__(self, other):
+        return self._graph == other._graph
 
 
 class ValveRegistry(Mapping[str, Valve]):
@@ -72,6 +85,7 @@ class ValveRegistry(Mapping[str, Valve]):
         return iter(self.__valves.values())
 
 
+@lru_cache
 def dijkstra(graph: Graph, source: Valve) -> Dict[Valve, int]:
     distances = {valve: float("inf") for valve in graph}
     distances[source] = 0
@@ -132,7 +146,7 @@ def simplify_graph(
 
 
 def find_path(
-    graph: Graph, start_node: Valve, time_left, opened_nodes=None
+    graph: Graph, start_node: Valve, time_left, opened_nodes=None, player_2=False
 ) -> List[List[GraphNode]]:
     if opened_nodes is None:
         opened_nodes = set()
@@ -146,11 +160,27 @@ def find_path(
 
     paths = [[GraphNode(start_node, time_left)]]
     graph = simplify_graph(graph, opened_nodes)
-    for node in to_open:
-        time = time_left - distances[node] - 1
+    while to_open:
+        valve = to_open.pop()
+        time = time_left - distances[valve] - 1
         if time > 0:
-            for p in find_path(graph, node, time, opened_nodes | {node}):
-                paths.append([GraphNode(start_node, time_left)] + p)
+            for p in find_path(graph, valve, time, opened_nodes | {valve}, player_2):
+                if player_2 and to_open:
+                    for valve_2 in to_open:
+                        for p2 in find_path(
+                            graph, valve, time, opened_nodes | {valve, valve_2}
+                        ):
+                            if (
+                                set(n.valve for n in p2[1:]).union(
+                                    n.valve for n in p[1:]
+                                )
+                                == {}
+                            ):
+                                paths.append(
+                                    [GraphNode(start_node, time_left)] + p + p2
+                                )
+                else:
+                    paths.append([GraphNode(start_node, time_left)] + p)
 
     return paths
 
@@ -158,7 +188,7 @@ def find_path(
 def score_paths(paths):
     for p in paths:
         output = sum(v.rate * t for v, t in p)
-        summary = "/".join(p[0].name for p in p)
+        summary = "/".join(f"{v.name}[{v.rate * t}]" for v, t in p)
         yield output, summary
 
 
@@ -171,12 +201,17 @@ def day16(sample):
         input_data = (config.USER_DIR / "day16.txt").read_text()
 
     valve_registry = ValveRegistry(input_data)
-
     AA = valve_registry.AA
-
     graph = simplify_graph(valve_registry.graph, {}, keep=AA)
+
     paths = find_path(graph, AA, 30)
     paths = sorted(score_paths(paths))
 
-    for p in paths:
+    for p in paths[-10:]:
+        print(p)
+
+    paths = find_path(graph, AA, 30, player_2=True)
+    paths = sorted(score_paths(paths))
+
+    for p in paths[-10:]:
         print(p)
