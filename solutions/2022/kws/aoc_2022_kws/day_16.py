@@ -1,11 +1,12 @@
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import lru_cache
-from typing import Dict, Iterable, Iterator, List, Mapping, NamedTuple, Tuple
+from typing import Dict, Iterable, Iterator, List, Mapping, NamedTuple, Set, Tuple
 
 import click
 from aoc_2022_kws.cli import main
 from aoc_2022_kws.config import config
+from rich.progress import track
 
 PTN_INPUT = re.compile(
     r"^Valve (\w\w) has flow rate=(\d+); tunnels? leads? to valves? (.*)$"
@@ -109,87 +110,43 @@ def dijkstra(graph: Graph, source: Valve) -> Dict[Valve, int]:
     return distances
 
 
-def simplify_graph(
-    graph: Graph, opened_valves: Iterable[Valve], keep: Valve = None
-) -> Graph:
-    to_remove = set(v for v in graph if v.rate == 0 or v in opened_valves)
-    if keep:
-        to_remove -= {keep}
+def find_paths(
+    distances,
+    active_valves: Set[Valve],
+    open_valves: Set[Valve],
+    current_valve,
+    time_remaining,
+) -> List[List[Tuple[Valve, int]]]:
+    if time_remaining <= 0:
+        return []
+    if time_remaining == 1:
+        return [[(current_valve, time_remaining - 1)]]
 
-    if not to_remove:
-        return graph
+    time_remaining -= 1
 
-    graph = dict(graph)
-
-    # For each node to remove, find all nodes that link to that node, and link to the removed node's neighbours instead
-    # repeat until no more nodes to remove
-    while to_remove:
-        node = to_remove.pop()
-        for n in graph:
-            if node in [g.valve for g in graph[n]]:
-                # Find the distance to the node
-                node_distance = next(g.distance for g in graph[n] if g.valve == node)
-
-                # New neighbours are the existing neighbours except the node to remove
-                new_neighbours = [GraphNode(v, d) for v, d in graph[n] if v != node]
-
-                # Add the neighbours of the node to remove except links to the node itself
-                new_neighbours.extend(
-                    [GraphNode(v, d + node_distance) for v, d in graph[node] if v != n]
-                )
-
-                graph[n] = new_neighbours
-
-        del graph[node]
-
-    return Graph(graph)
-
-
-def find_path(
-    graph: Graph, start_node: Valve, time_left, opened_nodes=None, player_2=False
-) -> List[List[GraphNode]]:
-    if opened_nodes is None:
-        opened_nodes = set()
-
-    to_open = set(n for n in graph if n.rate > 0) - opened_nodes
-
-    if not to_open:
-        return [[GraphNode(start_node, time_left)]]
-
-    distances = dijkstra(graph, start_node)
-
-    paths = [[GraphNode(start_node, time_left)]]
-    graph = simplify_graph(graph, opened_nodes)
-    while to_open:
-        valve = to_open.pop()
-        time = time_left - distances[valve] - 1
-        if time > 0:
-            for p in find_path(graph, valve, time, opened_nodes | {valve}, player_2):
-                if player_2 and to_open:
-                    for valve_2 in to_open:
-                        for p2 in find_path(
-                            graph, valve, time, opened_nodes | {valve, valve_2}
-                        ):
-                            if (
-                                set(n.valve for n in p2[1:]).union(
-                                    n.valve for n in p[1:]
-                                )
-                                == {}
-                            ):
-                                paths.append(
-                                    [GraphNode(start_node, time_left)] + p + p2
-                                )
-                else:
-                    paths.append([GraphNode(start_node, time_left)] + p)
-
+    paths = [[(current_valve, time_remaining)]]
+    for valve in active_valves - open_valves:
+        paths.extend(
+            [(current_valve, time_remaining), *p]
+            for p in find_paths(
+                distances,
+                active_valves,
+                open_valves | {valve},
+                valve,
+                time_remaining - distances[current_valve][valve],
+            )
+        )
     return paths
+
+
+def get_score(path):
+    return sum(v.rate * t for v, t in path)
 
 
 def score_paths(paths):
     for p in paths:
-        output = sum(v.rate * t for v, t in p)
-        summary = "/".join(f"{v.name}[{v.rate * t}]" for v, t in p)
-        yield output, summary
+        path_name = "->".join(v.name for v, _ in p)
+        yield path_name, get_score(p)
 
 
 @main.command()
@@ -201,17 +158,58 @@ def day16(sample):
         input_data = (config.USER_DIR / "day16.txt").read_text()
 
     valve_registry = ValveRegistry(input_data)
-    AA = valve_registry.AA
-    graph = simplify_graph(valve_registry.graph, {}, keep=AA)
 
-    paths = find_path(graph, AA, 30)
-    paths = sorted(score_paths(paths))
+    active_valves = {valve for valve in valve_registry if valve.rate}
+    distances = {}
+    for valve in active_valves:
+        distances[valve] = dijkstra(valve_registry.graph, valve)
 
-    for p in paths[-10:]:
-        print(p)
+    print("All distances calculated")
 
-    paths = find_path(graph, AA, 30, player_2=True)
-    paths = sorted(score_paths(paths))
+    paths = []
+    aa_distances = dijkstra(valve_registry.graph, valve_registry.AA)
+    for valve in active_valves:
+        paths.extend(
+            find_paths(
+                distances, active_valves, {valve}, valve, 30 - aa_distances[valve]
+            )
+        )
 
-    for p in paths[-10:]:
-        print(p)
+    print("Paths", len(paths))
+
+    scored_paths = list(score_paths(paths))
+    scored_paths.sort(key=lambda p: p[1])
+    for path_name, score in scored_paths[-5:]:
+        print(score, path_name)
+
+    # Part 2
+
+    p2_paths = []
+    for valve in active_valves:
+        p2_paths.extend(
+            find_paths(
+                distances, active_valves, {valve}, valve, 26 - aa_distances[valve]
+            )
+        )
+
+    print("Calculated paths")
+    p2_paths = sorted(p2_paths, key=lambda p: len(p))
+    print("Sorted paths")
+
+    max_score = -float("inf")
+    best_path = None
+    for my_ix, my_path in enumerate(track(p2_paths)):
+        my_valves = {v for v, _ in my_path}
+        for el_path in p2_paths[my_ix + 1 :]:
+            el_valves = {v for v, _ in el_path}
+            if not my_valves & el_valves:
+                combined_path = my_path + el_path
+                score = sum(v.rate * t for v, t in combined_path)
+                if score > max_score:
+                    max_score = score
+                    best_path = combined_path
+                    print(
+                        "New best", max_score, "->".join(v.name for v, _ in best_path)
+                    )
+
+    print("Combined paths", max_score, best_path)
