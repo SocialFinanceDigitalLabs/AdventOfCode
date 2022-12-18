@@ -1,11 +1,11 @@
-import math
 from collections import deque
+from queue import Queue
 from typing import Literal
 
 import click
+import numpy as np
 from aoc_2022_kws.cli import main
 from aoc_2022_kws.config import config
-from aocd import submit
 from rich.progress import track
 
 SPRITES = """
@@ -155,20 +155,14 @@ class Chamber:
 def simulate_game(jet, sprites, chamber, moves):
     jet = deque(jet)
     sprites = deque(sprites)
-    states = {}
 
     for i in track(range(moves)):
-        # cur_state = (chamber.state, tuple(jet), tuple(sprites))
-        # if cur_state in states:
-        #     print("Cycle detected", i, states[cur_state], i - states[cur_state])
-        # else:
-        #     states[cur_state] = i
+        yield i, chamber.max_y, chamber.state, tuple(jet), tuple(sprites)
         chamber.simplify()
         max_y = chamber.max_y
         rock = Rock(sprites[0], 2, max_y + 3)
         sprites.rotate(-1)
 
-        # print("Adding rock", rock, max_y)
         while True:
             if not chamber.collides(rock.move(jet[0])):
                 rock = rock.move(jet[0])
@@ -180,9 +174,65 @@ def simulate_game(jet, sprites, chamber, moves):
         chamber.add(rock)
 
 
+def part2_cycle(jet, sprites):
+    moves = 1000000000000
+
+    states = {}
+    heights = []
+
+    chamber = Chamber()
+    queue = deque(maxlen=6)
+    cycle = False
+    for i, max_y, *state in simulate_game(jet, sprites, chamber, moves):
+        heights.append(max_y)
+        state = tuple(state)
+        last_state = states.get(state)
+        if last_state is None:
+            states[state] = i
+        else:
+            queue.append(last_state)
+            if len(queue) == queue.maxlen:
+                xdiff = np.diff(queue)
+                if xdiff[0] == xdiff[1] == xdiff[3] == xdiff[4] == 1 and xdiff[2] != 1:
+                    cycle = True
+                    break
+
+    if cycle:
+        cycle_start = min(queue)
+        cycle_length = max(queue) - min(queue) + 1
+
+        print("Cycle detected")
+        print("Cycle start =", cycle_start)
+        print("Cycle length =", cycle_length)
+
+        start_height = heights[cycle_start]
+        cycle_height = heights[max(queue) + 1] - heights[cycle_start]
+
+        print("Height at cycle start =", start_height)
+        print("Height per cycle =", cycle_height)
+
+        cycle_count = (moves - cycle_start) // cycle_length
+        extra_cycles = (moves - cycle_start) % cycle_length
+
+        print("Cycle count =", cycle_count)
+        print("Extra cycles =", extra_cycles)
+
+        answer = (
+            start_height
+            + cycle_height * cycle_count
+            + heights[cycle_start + extra_cycles]
+            - heights[cycle_start]
+        )
+        print("PART2", answer)
+    else:
+        print("PART2", chamber.max_y)
+
+
 @main.command()
 @click.option("--sample", "-s", is_flag=True)
-def day17(sample):
+@click.option("--part-1", "-1", "part_1", is_flag=True)
+@click.option("--part-2", "-2", "part_2", is_flag=True)
+def day17(sample, part_1, part_2):
     if sample:
         input_data = (config.SAMPLE_DIR / "day17.txt").read_text()
     else:
@@ -196,39 +246,11 @@ def day17(sample):
         print(s.shape)
         print()
 
-    # chamber = Chamber()
-    # simulate_game(jet, sprites, chamber, 2022)
-    # print("PART1", chamber.max_y)
+    if part_1:
+        chamber = Chamber()
+        for move in simulate_game(jet, sprites, chamber, 2022):
+            pass
+        print("PART1", chamber.max_y)
 
-    moves = 1000000000000
-    if sample:
-        cycle = 35
-        cycle_start = 15
-    else:
-        cycle = 1745
-        cycle_start = 72
-
-    chamber = Chamber()
-    simulate_game(jet, sprites, chamber, cycle_start + cycle)
-    p2_1 = chamber.max_y
-
-    chamber = Chamber()
-    simulate_game(jet, sprites, chamber, cycle_start + cycle * 2)
-    p2_2 = chamber.max_y
-
-    remainder = (moves % cycle) - 1
-
-    chamber = Chamber()
-    simulate_game(jet, sprites, chamber, cycle_start + cycle + remainder)
-    p2_3 = chamber.max_y
-
-    increments_per_cycle = p2_2 - p2_1
-
-    print("Cycle loops =", cycle)
-    print("Cycles height =", p2_1, p2_2, p2_3)
-    print("Increment per cycle height =", increments_per_cycle)
-    print("Remainder loops =", remainder)
-    print("Increment for remainder height =", p2_3 - p2_1)
-
-    answer = increments_per_cycle * (moves // cycle) + p2_3 - p2_1
-    print("PART2", answer, answer - 1569054441249)  # Too high
+    if part_2:
+        part2_cycle(jet, sprites)
