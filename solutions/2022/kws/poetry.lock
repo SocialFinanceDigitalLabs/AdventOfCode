@@ -1648,7 +1648,7 @@ python-versions = ">=3.6"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2a4ba04c372b7804d21956ae5d96ab0efe24c18e1194306fb4eba5b01e97387b"
+content-hash = "2dffe21a4e82c7ea59124f18813b4f0d5a104b09f3dd0c28c637b76f5e13ff3c"
 
 [metadata.files]
 advent-of-code-data = [
