@@ -19,6 +19,7 @@ trimesh = {extras = ["easy"], version = "^3.17.1"}
 jupyterlab = "^3.5.1"
 pyglet = "<2"
 sympy = "^1.11.1"
+frozendict = "^2.3.4"
 
 [tool.poetry.scripts]
 aoc22 = "aoc_2022_kws.cli:main"
