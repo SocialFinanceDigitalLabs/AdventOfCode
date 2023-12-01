@@ -1,3 +1,5 @@
+import os
+
 from part1 import calib_sum, day1_part1, get_calibration_values
 from part2 import day2_part2, words_and_nums
 
@@ -30,10 +32,12 @@ def test_day1_part1():
     a1b2c3d4e5f
     treb7uchet"""
 
-    with open("test_day1.txt", "w") as f:
+    sample_data = "test_day1.txt"
+    with open(sample_data, "w") as f:
         f.write(test_data)
 
-    assert day1_part1(filepath="test_day1.txt") == 142
+    assert day1_part1(filepath=sample_data) == 142
+    os.remove(sample_data)
 
 
 def test_day1_part2():
@@ -45,7 +49,9 @@ def test_day1_part2():
     zoneight234
     7pqrstsixteen"""
 
-    with open("test_day2.txt", "w") as f:
+    sample_data = "test_day2.txt"
+    with open(sample_data, "w") as f:
         f.write(test_data)
 
-    assert day2_part2(filepath="test_day2.txt") == 281
+    assert day2_part2(filepath=sample_data) == 281
+    os.remove(sample_data)
