@@ -1,6 +1,6 @@
-# Advent of code 2022
+# Advent of code 2023
 
-This repository contains my solutions to the [Advent of Code 2022](https://adventofcode.com/2022) challenges
+This repository contains my solutions to the [Advent of Code 2023](https://adventofcode.com/2023) challenges
 by [Kaj](https://github.com/kws) as part of the 
 [Social Finance](https://www.socialfinance.org.uk) Advent of Code team.
 
@@ -13,13 +13,13 @@ To run the code, first install Poetry and then run:
 ```bash
 poetry install
 poetry shell
-aoc22 day<day> 
+aoc23 day<day> 
 ```
 
 where `<day>` is the day number, e.g.
 
 ```bash
-aoc22 day01 
+aoc23 day01 
 ```
 
 First time you run the code you will be prompted for a username. This username
