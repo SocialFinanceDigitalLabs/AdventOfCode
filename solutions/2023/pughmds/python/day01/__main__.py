@@ -17,17 +17,18 @@ NUMBERS = {
 
 
 def getDigitsFromString(row):
-    digits = re.findall(r'\d', row)
+    digits = re.findall(r"\d", row)
     value = 0
     if digits:
         value = int(digits[0] + digits[-1])
 
     return value
 
+
 def run(data):
     """
-    Takes a list of values in "data" and returns sum of the largest
-    group. Groups are separated by blank entries in the list.
+    Takes a list of values in "data" and returns the total
+    of first and last digits concatenated in the string
     """
     total = 0
     for row in data:
@@ -36,18 +37,26 @@ def run(data):
     return total
 
 
-def replaceNumericalWords(row, lowestValue, highestValue):
-    newstr = row[:lowestValue["Value"]]
+def replaceNumericalWords(row: str, lowestValue: dict, highestValue: dict) -> str:
+    """
+    Take where we found the first and last numerical words in the string, and replace them with
+    the related values
+    """
+    newstr = row[: lowestValue["Value"]]
     newstr += NUMBERS[lowestValue["Key"]]["Value"]
-    newstr += row[lowestValue["Value"] + len(lowestValue["Key"]):highestValue["Value"]]
+    newstr += row[
+        lowestValue["Value"] + len(lowestValue["Key"]) : highestValue["Value"]
+    ]
     newstr += NUMBERS[highestValue["Key"]]["Value"]
-    newstr += row[highestValue["Value"] + len(highestValue["Key"]):]
+    newstr += row[highestValue["Value"] + len(highestValue["Key"]) :]
     return newstr
+
 
 def run_p2(data):
     """
-    Takes a list of values in "data" and returns sum of the largest
-    group. Groups are separated by blank entries in the list.
+    Takes a list of values in "data" and returns the total
+    of first and last digits concatenated in the string.
+    First and last digits now include number words
     """
     total = 0
 
