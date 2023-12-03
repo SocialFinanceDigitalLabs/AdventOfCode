@@ -7,13 +7,16 @@ def get_numbers(file: str) -> list:
     return numbers
 
 
-def get_num_indices(engine_data_lines: list, num: str) -> tuple:
+def get_num_indices(engine_data_lines: list, num: str) -> list[tuple]:
+    num_locs = []
     for row_num in range(len(engine_data_lines)):
         row = engine_data_lines[row_num]
         if num in row:
-            col_num = row.index(num)
-            return row_num, col_num
-    return None, None
+            # get all locations of num within row
+            col_values = [element.start() for element in re.finditer(num, row)]
+            for col_val in col_values:
+                num_locs.append((row_num, col_val))
+    return num_locs
 
 
 def within_bounds(neighbor_loc: tuple, data_span: tuple) -> bool:
@@ -58,8 +61,7 @@ def get_adjacent_values(engine_data_lines: list, num_loc: tuple, num_len: int) -
     return neighbors
 
 
-def is_part_number(engine_data_lines, num: str) -> bool:
-    num_loc = get_num_indices(engine_data_lines, num)
+def is_part_number(engine_data_lines: list[str], num_loc: tuple, num: str) -> bool:
     neighbors = get_adjacent_values(engine_data_lines, num_loc, len(num))
     could_be_symbol = [
         element for element in neighbors if not element.isdigit() and element != "."
@@ -76,11 +78,16 @@ def day3_part1(filepath: str) -> int:
 
     numbers = get_numbers(engine_data)
     engine_data_lines = engine_data.split("\n")
-    # num_indices = get_num_indices(engine_data_lines, numbers)
     part_numbers = []
-    for num in numbers:
-        if is_part_number(engine_data_lines, num):
-            part_numbers.append(int(num))
+    for num in set(numbers):
+        # get all locations of the number in engine_data_lines
+        num_locs = set(get_num_indices(engine_data_lines, num))
+        # locations can be used as unique identifiers for numbers.
+        for num_loc in num_locs:
+            # for every location, check if it is a part number.
+            if is_part_number(engine_data_lines, num_loc, num):
+                # as many times as it is found to be a part number, add it to the list
+                part_numbers.append(int(num))
     return sum(part_numbers)
 
 

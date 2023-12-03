@@ -1,13 +1,6 @@
 import os
 
-import pandas as pd
-from day3.part1 import (
-    day3_part1,
-    get_adjacent_values,
-    get_num_indices,
-    get_numbers,
-    is_part_number,
-)
+from day3.part1 import day3_part1, get_adjacent_values, get_num_indices, get_numbers
 
 # from day3.part2 import day2_part2
 
@@ -39,7 +32,7 @@ def test_get_numbers():
 
 def test_get_num_indices():
     input = ["467..114..", "...*......", "..35..633."]
-    assert get_num_indices(input, "114") == (0, 5)
+    assert get_num_indices(input, "114") == [(0, 5)]
 
 
 def test_get_adjacent_values():
