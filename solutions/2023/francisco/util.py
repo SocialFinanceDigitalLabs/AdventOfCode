@@ -79,5 +79,5 @@ def submit_answer(day: int, answer: int | str, part: int = 1) -> bool:
         if part == 1:
             print("Getting part2 statement")
             statement, test_input, final_input = get_inputs(day)
-            with open("statement.md", "w") as f:
+            with open(os.path.join(str(day).zfill(2), "STATEMENT.md"), "w") as f:
                 f.write(markdownify(statement))
