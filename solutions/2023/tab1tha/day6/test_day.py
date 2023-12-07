@@ -1,7 +1,7 @@
 import os
 
 from day6.part1 import day6_part1, error_margin, hold_options, read_stats
-from day6.part2 import day6_part2, read_stat
+from day6.part2 import compute_win_bound, day6_part2, large_hold_options, read_stat
 
 
 def test_read_stats():
@@ -23,6 +23,17 @@ def test_hold_options():
     assert race3_options[0] == 11
     assert race3_options[-1] == 19
     assert len(race3_options) == 9
+
+
+def test_compute_win_bound():
+    assert compute_win_bound(time=7, distance=9, descend=True) == 2
+    assert compute_win_bound(time=7, distance=9, descend=False) == 5
+
+    assert compute_win_bound(time=15, distance=40, descend=True) == 4
+    assert compute_win_bound(time=15, distance=40, descend=False) == 11
+
+    assert compute_win_bound(time=30, distance=200, descend=True) == 11
+    assert compute_win_bound(time=30, distance=200, descend=False) == 19
 
 
 def test_error_margin():
@@ -47,7 +58,14 @@ def test_read_stat():
     assert read_stat(test_data) == (71530, 940200)
 
 
-def test_day3_part2():
+def test_large_hold_options():
+    assert large_hold_options(time=7, distance=9) == (2, 5)
+    assert large_hold_options(time=15, distance=40) == (4, 11)
+    assert large_hold_options(time=30, distance=200) == (11, 19)
+    assert large_hold_options(time=71530, distance=940200) == (14, 71516)
+
+
+def test_day6_part2():
     test_data = """Time:      7  15   30
     Distance:  9  40  200
     """
