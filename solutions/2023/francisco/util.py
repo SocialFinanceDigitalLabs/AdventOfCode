@@ -14,7 +14,7 @@ class FileParser:
         self.file_name = file_name
         self.file_path = os.path.join(self.dir_path, self.file_name)
 
-    def read(self) -> list:
+    def read(self) -> list[str]:
         with open(self.file_path) as f:
             data = [d.strip("\n") for d in f.readlines()]
         return data
