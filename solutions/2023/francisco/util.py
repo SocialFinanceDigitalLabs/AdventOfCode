@@ -7,19 +7,17 @@ from markdownify import markdownify
 AOC_COOKIE = config("AOC_COOKIE")
 YEAR = 2023
 
+
 class FileParser:
     def __init__(self, dir_path: str, file_name: str) -> None:
         self.dir_path = dir_path
         self.file_name = file_name
+        self.file_path = os.path.join(self.dir_path, self.file_name)
 
-    def load(self) -> list:
+    def read(self) -> list[str]:
         with open(self.file_path) as f:
             data = [d.strip("\n") for d in f.readlines()]
         return data
-
-    def read(self) -> list[str]:
-        self.file_path = os.path.join(self.dir_path, self.file_name)
-        return self.load()
 
 
 def find_html_block(text: str, tag: str):
@@ -41,7 +39,8 @@ def get_inputs(day: int):
     final_input = input_res.text
     return statement, test_input, final_input
 
-def dump_inputs(statement:str, test_input:str, final_input:str, day_dir:str):
+
+def dump_inputs(statement: str, test_input: str, final_input: str, day_dir: str):
     with open(os.path.join(day_dir, "STATEMENT.md"), "w") as f:
         f.write(markdownify(statement))
 
@@ -50,6 +49,7 @@ def dump_inputs(statement:str, test_input:str, final_input:str, day_dir:str):
 
     with open(os.path.join(day_dir, "final.txt"), "w") as f:
         f.write(final_input)
+
 
 def new_day(day: int):
     day_dir = str(day).zfill(2)
