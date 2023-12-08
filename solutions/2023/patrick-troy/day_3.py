@@ -1,4 +1,6 @@
 from aocd import get_data
+import re
+import math
 
 session = "53616c7465645f5f5e959babee3b98732450e5a8dc2320e845ed91c80b7f39fe01f7" \
           "c01baa3710d5d1e1f631fe6c9f768fc1a035e9c3d5cd00e23c7ea0637cae"
@@ -19,74 +21,48 @@ test = [
 ]
 
 
-symbols = ["*", "#", "+", "-", "$", "@", "=", "%", "/", "&"]
+def _get_symbol_co_ords(puzzle_input):
+    return {(r, c): [] for r in range(len(puzzle_input)) for c in range(len(puzzle_input))
+            if puzzle_input[r][c] not in '01234566789.'}
 
 
-def _get_value(co_ord: tuple, dictionary_list: list):
-    for d in dictionary_list:
-        if co_ord in d:
-            return d[co_ord]
+def _get_star_co_ords(puzzle_input):
+    return {(r, c): [] for r in range(len(puzzle_input)) for c in range(len(puzzle_input))
+            if puzzle_input[r][c] == '*'}
 
 
-def solve(puzzle_input):
-    co_ords = []
-    for x, row in enumerate(puzzle_input):
-        for y, cell in enumerate(row):
-            try:
-                cell = {(x, y): int(cell)}
-            except:
-                cell = {(x, y): cell}
-            co_ords.append(cell)
+def _get_numbers_next_to_symbols(puzzle_input, stars_only=False):
+    if stars_only:
+        symbol_co_ords = _get_star_co_ords(puzzle_input)
+    else:
+        symbol_co_ords = _get_symbol_co_ords(puzzle_input)
 
-    matching_co_ords = []
-    for x in range(len(puzzle_input)):
-        for y in range(len(puzzle_input)):
-            if (
-                    isinstance(_get_value((x, y), co_ords), int) and
-                    (_get_value((x+1, y), co_ords) in symbols
-                     or _get_value((x-1, y), co_ords) in symbols
-                     or _get_value((x, y+1), co_ords) in symbols
-                     or _get_value((x, y-1), co_ords) in symbols
-                     or _get_value((x+1, y+1), co_ords) in symbols
-                     or _get_value((x-1, y-1), co_ords) in symbols
-                     or _get_value((x-1, y+1), co_ords) in symbols
-                     or _get_value((x+1, y-1), co_ords) in symbols)
-            ):
+    numbers = {}
+    for r, row in enumerate(puzzle_input):
+        for n in re.finditer(r'\d+', row):
+            numbers[(r, n)] = n.group()
+            edge = {(r, c) for r in (r-1, r, r+1) for c in range(n.start()-1, n.end()+1)}
 
-                matching_co_ords.append((x, y))
+            for overlap in edge & symbol_co_ords.keys():
+                if (r, n) in numbers:
+                    symbol_co_ords[overlap].append(int(n.group()))
+                    numbers.pop((r, n))
 
-    overlapping_co_ords = []
-    for i in range(len(matching_co_ords)-1):
-        if matching_co_ords[i][0] == matching_co_ords[i+1][0]:
-            if matching_co_ords[i][1] == matching_co_ords[i+1][1]-1:
-                overlapping_co_ords.append(matching_co_ords[i])
-
-    non_overlapping_co_ords = [x for x in matching_co_ords if x not in overlapping_co_ords]
-
-    numbers = []
-    for x, y in non_overlapping_co_ords:
-        if isinstance(_get_value((x, y-1), co_ords), int):
-            if isinstance(_get_value((x, y-2), co_ords), int):
-                numbers.append(int(f"{_get_value((x, y-2), co_ords)}{_get_value((x, y-1), co_ords)}{_get_value((x, y), co_ords)}"))
-            elif isinstance(_get_value((x, y+1), co_ords), int):
-                numbers.append(int(f"{_get_value((x, y - 1), co_ords)}{_get_value((x, y), co_ords)}{_get_value((x, y+1), co_ords)}"))
-            else:
-                numbers.append(int(f"{_get_value((x, y - 1), co_ords)}{_get_value((x, y), co_ords)}"))
-
-        elif isinstance(_get_value((x, y+1), co_ords), int):
-            if isinstance(_get_value((x, y+2), co_ords), int):
-                numbers.append(int(f"{_get_value((x, y), co_ords)}{_get_value((x, y + 1), co_ords)}{_get_value((x, y + 2), co_ords)}"))
-            elif isinstance(_get_value((x, y-1), co_ords), int):
-                numbers.append(int(f"{_get_value((x, y - 1), co_ords)}{_get_value((x, y), co_ords)}{_get_value((x, y + 1), co_ords)}"))
-            else:
-                numbers.append(int(f"{_get_value((x, y), co_ords)}{_get_value((x, y + 1), co_ords)}"))
-
-        else:
-            numbers.append(int(f"{_get_value((x, y), co_ords)}"))
-
-    print(sum(numbers))
+    return symbol_co_ords
 
 
-assert solve(test) == 4361
+def solve_1(puzzle_input):
+    numbers = _get_numbers_next_to_symbols(puzzle_input)
+    return sum(sum(p) for p in numbers.values())
 
 
+def solve_2(puzzle_input):
+    numbers = _get_numbers_next_to_symbols(puzzle_input, stars_only=True)
+    return sum(math.prod(p) for p in numbers.values() if len(p) == 2)
+
+
+assert solve_1(test) == 4361
+print(solve_1(data))
+
+assert solve_2(test) == 467835
+print(solve_2(data))
