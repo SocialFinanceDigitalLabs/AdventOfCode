@@ -43,7 +43,7 @@ test = [
 ]
 
 
-def solve_1(puzzle_input):
+def _create_maps(puzzle_input):
     seeds = {}
     seed_to_soil = {"seed_to_soil": []}
     soil_to_fertilizer = {}
@@ -52,21 +52,15 @@ def solve_1(puzzle_input):
     light_to_temperature = {}
     temperature_to_humidity = {}
     humidity_to_location = {}
-    # for row in iter(puzzle_input):
-    #     if "seeds" in row:
-    #         seeds["seeds"] = re.findall(r"\d+", row)
-    #     elif "seed-to-soil" in row:
-    #         seed_to_soil["seed_to_soil"].append(re.findall(r"\d+", next(row)))
-
-    row = iter(puzzle_input)
-    for r in row:
+    for row in puzzle_input:
         if "seeds" in row:
-            seeds["seeds"] = re.findall(r"\d+", r)
+            seeds["seeds"] = re.findall(r"\d+", row)
         elif "seed-to-soil" in row:
-            seed_to_soil["seed_to_soil"].append(re.findall(r"\d+", r))
+            seed_to_soil["seed_to_soil"].append(re.findall(r"\d+", next(row)))
+
 
 
     # print(seed_to_soil)
 
 
-solve_1(test)
+_create_maps(test)

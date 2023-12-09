@@ -17,42 +17,43 @@ test = [
 ]
 
 
-def solve_1(puzzle_input):
-    points = []
+def _find_matches(puzzle_input):
+    match_list = []
     for card in puzzle_input:
         winning_no = re.findall(r"\d+", card.split("|")[0].split(":")[1])
         my_no = re.findall(r"\d+", card.split("|")[1])
 
         matches = [x for x in my_no if x in winning_no]
-        if matches:
-            points.append(2**(len(matches)-1))
+        match_list.append(matches)
+    return match_list
 
-    print(sum(points))
 
-# solve_1(test)
+def solve_1(puzzle_input):
+    points = []
+    matches = _find_matches(puzzle_input)
+
+    for match in matches:
+        if match:
+            points.append(2**(len(match)-1))
+    return sum(points)
+
+
+assert solve_1(test) == 13
+print(solve_1(data))
 
 
 def solve_2(puzzle_input):
-    cards = []
-    for i, card in enumerate(puzzle_input):
-        winning_no = re.findall(r"\d+", card.split("|")[0].split(":")[1])
-        my_no = re.findall(r"\d+", card.split("|")[1])
+    cards = [1 for _ in puzzle_input]
+    matches = _find_matches(puzzle_input)
 
-        matches = [x for x in my_no if x in winning_no]
-        cards.append({i+1: len(matches), "copies": 1})
+    for i, match in enumerate(matches):
+        n = len(match)
 
-    print(cards)
+        for j in range(n):
+            cards[i + j + 1] += cards[i]
 
-    for i, value in enumerate(cards):
-        for x in range(list(value.values())[0]):
-            cards[i+x]["copies"] += 1
-            # print(i, x)
-            # print(cards)
-
-    print(cards)
+    return sum(cards)
 
 
-
-
-
-solve_2(test)
+assert solve_2(test) == 30
+print(solve_2(data))
