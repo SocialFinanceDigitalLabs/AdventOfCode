@@ -73,8 +73,12 @@ def run(data):
 
 
 def run_p2(data):
-    # Same as above, but crazy rules involving...more scratch cards?
-
+    '''
+        Same as above, but crazy rules involving...more scratch cards?
+        Takes a LONG time to run, so use with caution. Probably could
+        speed up greatly with some tricks in mapping, but I have my
+        answer and need to catch up so will save for later.
+    '''
     seeds, processes = parseInput(data)
     seeds = [int(s) for s in seeds]
 
