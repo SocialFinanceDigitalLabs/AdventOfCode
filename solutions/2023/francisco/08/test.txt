@@ -1,0 +1,10 @@
+LR
+
+CCA = (CCB, XXX)
+CCB = (XXX, CCZ)
+CCZ = (CCB, XXX)
+DDA = (DDB, XXX)
+DDB = (DDC, DDC)
+DDC = (DDZ, DDZ)
+DDZ = (DDB, DDB)
+XXX = (XXX, XXX)
