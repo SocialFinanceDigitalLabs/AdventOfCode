@@ -13,27 +13,13 @@ test = [
     "QQQJA 483",
 ]
 
-points = {
-    "A": 13,
-    "K": 12,
-    "Q": 11,
-    "J": 10,
-    "T": 9,
-    "9": 8,
-    "8": 7,
-    "7": 6,
-    "6": 5,
-    "5": 4,
-    "4": 3,
-    "3": 2,
-    "2": 1,
-}
-
 
 def _create_dict(puzzle_input):
     puzzle_list = []
     for row in puzzle_input:
-        puzzle_list.append({row.split()[0]: row.split()[1]})
+        hand, bid = row.split()[0], row.split()[1]
+        hand = hand.translate(str.maketrans("TJQKA", "ABCDE"))
+        puzzle_list.append({hand: int(bid)})
 
     return puzzle_list
 
@@ -71,10 +57,21 @@ def _game_sorter(puzzle_input):
 
 
 def _hand_sorter(puzzle_input):
+    sorted_hands = []
     game_dict = _game_sorter(puzzle_input)
-    for type, games in game_dict.items():
-        print(type, games)
+    for _type, games in game_dict.items():
+        sorted_hands.extend(sorted(games, reverse=True))
+
+    return sorted_hands
 
 
+def _point_giver(puzzle_input):
+    puzzle_list = _create_dict(puzzle_input)
+    print(puzzle_list)
+    sorted_hands = _hand_sorter(puzzle_input)
 
-print(_hand_sorter(test))
+    for i, hand in enumerate(reversed(sorted_hands), 1):
+        print(i, hand)
+
+
+print(_point_giver(test))

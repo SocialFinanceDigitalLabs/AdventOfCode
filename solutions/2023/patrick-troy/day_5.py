@@ -1,66 +1,60 @@
 from aocd import get_data
-import re
+from functools import reduce
 
 session = "53616c7465645f5f5e959babee3b98732450e5a8dc2320e845ed91c80b7f39fe01f7" \
           "c01baa3710d5d1e1f631fe6c9f768fc1a035e9c3d5cd00e23c7ea0637cae"
 
-data = get_data(day=5, year=2023, session=session).split("\n")
-
-test = [
-    "seeds: 79 14 55 13",
-    "",
-    "seed-to-soil map:",
-    "50 98 2",
-    "52 50 48",
-    "",
-    "soil-to-fertilizer map:",
-    "0 15 37",
-    "37 52 2",
-    "39 0 15",
-    "",
-    "fertilizer-to-water map:",
-    "49 53 8",
-    "0 11 42",
-    "42 0 7",
-    "57 7 4",
-    "",
-    "water-to-light map:",
-    "88 18 7",
-    "18 25 70",
-    "",
-    "light-to-temperature map:",
-    "45 77 23",
-    "81 45 19",
-    "68 64 13",
-    "",
-    "temperature-to-humidity map:",
-    "0 69 1",
-    "1 0 69",
-    "",
-    "humidity-to-location map:",
-    "60 56 37",
-    "56 93 4",
-]
+seeds, *mappings = get_data(day=5, year=2023, session=session).split("\n\n")
+test_seeds, *test_mappings = open("solutions/2023/patrick-troy/samples/day_5_1.txt").read().split("\n\n")
 
 
-def _create_maps(puzzle_input):
-    seeds = {}
-    seed_to_soil = {"seed_to_soil": []}
-    soil_to_fertilizer = {}
-    fertilizer_to_water = {}
-    water_to_light = {}
-    light_to_temperature = {}
-    temperature_to_humidity = {}
-    humidity_to_location = {}
-    for row in puzzle_input:
-        if "seeds" in row:
-            seeds["seeds"] = re.findall(r"\d+", row)
-        elif "seed-to-soil" in row:
-            seed_to_soil["seed_to_soil"].append(re.findall(r"\d+", next(row)))
+def _map_seeds(seeds):
+    return map(int, seeds.split()[1:])
 
 
+def _lookup(seed_start, mapping):
+    for m in mapping.split('\n')[1:]:
+        dest_start, source_start, length = map(int, m.split())
+        delta = seed_start - source_start
+        if delta in range(length):
+            return dest_start + delta
+    else:
+        return seed_start
 
-    # print(seed_to_soil)
+
+def solve_1(seeds, mappings):
+    seeds = _map_seeds(seeds)
+    return min(reduce(_lookup, mappings, int(s)) for s in seeds)
 
 
-_create_maps(test)
+assert solve_1(test_seeds, test_mappings) == 35
+print(solve_1(seeds, mappings))
+
+
+def _lookup_2(seed_start, mapping):
+    for start, range in seed_start:
+        while range > 0:
+            for m in mapping.split('\n')[1:]:
+                dest_start, source_start, length = map(int, m.split())
+                delta = start - source_start
+                if delta in range(length):
+                    length = min(length - delta, range)
+                    yield dest_start + delta, length
+                    start += length
+                    range -= length
+                    break
+            else:
+                yield start, range
+                break
+
+
+def solve_2(seeds, mappings):
+    seeds = list(_map_seeds(seeds))
+    all_seeds = []
+    for row in [[*range(s[0], s[0]+s[1])] for s in zip(seeds[0::2], seeds[1::2])]:
+        all_seeds.extend(row)
+    return min(reduce(_lookup, mappings, int(s)) for s in all_seeds)
+
+
+assert solve_2(test_seeds, test_mappings) == 46
+print(solve_2(seeds, mappings))
