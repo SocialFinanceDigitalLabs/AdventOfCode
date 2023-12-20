@@ -119,19 +119,56 @@ export const solution2 = () => {
   };
 
   const plotList = () => {
+    grid.forEach((row: any, i: number) => {
+      row.forEach((col: any, j: number) => {
+        grid[i][j] = '';
+      });
+    });
+
     Object.values(list).forEach((el: GridElement) => {
       const mapped = grid[el?.self.y as number][el?.self.x as number];
 
-      grid[el?.self.y as number][el?.self.x as number] =
-        ['|', '-'].indexOf(mapped) < 0 ? 'o' : mapped;
+      grid[el?.self.y as number][el?.self.x as number] = el?.char || '';
     });
+  };
+
+  const getClassName = (char: string) => {
+    if (char === '-') {
+      return 'cell-horiz';
+    }
+
+    if (char === '|') {
+      return 'cell-vert';
+    }
+
+    if (char === '') {
+      return 'cell-none';
+    }
+
+    return 'cell-' + char;
+  };
+
+  const exportGrid = () => {
+    const output: any = grid.map((row: any) => {
+      const rowOutput = row.map((col: any) => {
+        return `<td class="${getClassName(col)}"><span>${col}</span></td>`;
+      });
+
+      return `<tr>${rowOutput.join('')}</tr>`;
+    });
+
+    const toRender = `<html><head><link rel="stylesheet" href="./styles.css" /></head><body><table><tbody>${output.join(
+      ''
+    )}</tbody></table><script src="./script.js"></script></body></html>`;
+
+    fs.writeFileSync(`${__dirname}/html/table.html`, toRender);
   };
 
   buildList();
 
   plotList();
 
-  console.table(grid);
+  exportGrid();
 
   const output = 10;
 
