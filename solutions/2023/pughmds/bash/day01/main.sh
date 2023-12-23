@@ -20,6 +20,6 @@ run() {
   echo $total
 }
 
-#result=$(run "../../inputs/day01/test1.txt")
+#result=$(run "../../inputs/day01/test5.txt")
 result=$(run "../../inputs/day01/input.txt")
 echo "Result: $result"

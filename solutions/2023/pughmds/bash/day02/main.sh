@@ -41,6 +41,6 @@ run() {
 
 
 
-#result=$(run "../../inputs/day02/test1.txt")
+#result=$(run "../../inputs/day02/test5.txt")
 result=$(run "../../inputs/day02/input.txt")
 echo "Result: $result"
