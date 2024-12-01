@@ -1,0 +1,41 @@
+table {
+  border-collapse: collapse;
+}
+
+td {
+  width: 10px;
+  height: 10px;
+
+  border: 1px solid red;
+}
+
+td span {
+  display: none;
+}
+
+td.cell-vert {
+  background: url('./img/vert.png') center center no-repeat;
+}
+
+td.cell-horiz {
+  background: url('./img/horiz.png') center center no-repeat;
+}
+
+td.cell-F {
+  background: url('./img/tl.png') center center no-repeat;
+}
+td.cell-7 {
+  background: url('./img/tr.png') center center no-repeat;
+}
+
+td.cell-L {
+  background: url('./img/bl.png') center center no-repeat;
+}
+
+td.cell-J {
+  background: url('./img/br.png') center center no-repeat;
+}
+
+td.cell-selected {
+  background: green;
+}
