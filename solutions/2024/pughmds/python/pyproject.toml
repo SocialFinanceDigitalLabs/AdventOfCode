@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "aoc2024"
+version = "0.1.0"
+description = ""
+authors = ["Matthew Pugh <pughmds@cyram.org>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+black = "^24.10.0"
+pylint = "^3.3.2"
+pytest = "^8.3.4"
+click = "^8.1.7"
+importlib = "^1.0.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
