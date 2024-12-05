@@ -3,6 +3,7 @@ import importlib
 from input_processing.parse_file import open_file
 from input_processing.run import create_result
 
+import json
 import glob
 import re
 
@@ -49,8 +50,10 @@ def run(day, test, part1, part2):
             res["Value"] = module.run_p2(input_file_data)
             results.append(res)
 
+        if test:
+            res["file"] = file
     print(f"day {day} results:")
-    print(results)
+    print(json.dumps(results,sort_keys=True, indent=4))
 
 
 if __name__ == "__main__":
