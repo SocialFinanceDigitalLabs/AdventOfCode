@@ -1,14 +1,12 @@
-
-import click
-from aocd import submit
-
-from aoc_2024_kws.cli import main
-from aoc_2024_kws.config import config
-
 import time
 
-class Grid:
+import click
+from aoc_2024_kws.cli import main
+from aoc_2024_kws.config import config
+from aocd import submit
 
+
+class Grid:
     def __init__(self, input_data: list[str]):
         self.grid = {}
         self.guard = None
@@ -29,7 +27,8 @@ def setup_grid(input_data: list[str]):
     guard = None
     return grid, guard, len(input_data[0]), len(input_data)
 
-def print_grid(grid, *,visited: set[tuple[int, int]] = None):
+
+def print_grid(grid, *, visited: set[tuple[int, int]] = None):
     if visited is None:
         visited = set()
     for y in range(grid.height):
@@ -53,13 +52,12 @@ class Item:
     @property
     def position(self):
         return (self.x, self.y)
-    
+
     def __hash__(self):
         return hash((self.x, self.y))
-    
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
-
 
     def __repr__(self):
         return "#"
@@ -76,15 +74,19 @@ class Guard(Item):
         next_pos = self.next_position
         if next_pos in self.grid.grid:
             return True
-        
+
     @property
     def out_of_bounds(self):
         # Check if next position is out of bounds
         next_pos = self.next_position
-        if (next_pos[0] < 0 or next_pos[0] >= self.grid.width or 
-            next_pos[1] < 0 or next_pos[1] >= self.grid.height):
+        if (
+            next_pos[0] < 0
+            or next_pos[0] >= self.grid.width
+            or next_pos[1] < 0
+            or next_pos[1] >= self.grid.height
+        ):
             return True
-        
+
         return False
 
     def move(self):
@@ -133,22 +135,54 @@ def run_simulation(grid):
         visited_heading.add(pos_heading)
 
     return visited, visited_heading, False
-    
-                            
+
+
+def animate_simulation(input_data):
+    grid = Grid(input_data)
+    from aoc_2024_kws.extras.day_06 import Animator, GridImage
+
+    animator = Animator(grid)
+    guard = grid.guard
+    turn = 0
+    while True:
+        if guard.out_of_bounds:
+            break
+        if guard.blocked:
+            guard.rotate_90_clockwise()
+        else:
+            guard.move()
+
+        animator.draw(guard, crop=(200, 200))
+        # animator.images[0].show()
+        # import sys
+        # sys.exit(0)
+        if len(animator.images) > 250:
+            break
+
+        turn += 1
+        if turn % 10 == 0:
+            print(len(animator.images))
+
+    animator.save_animation("day06.gif")
+
+
 @main.command()
 @click.option("--sample", "-s", is_flag=True)
-def day06(sample):
+@click.option("--animate", "-a", is_flag=True)
+def day06(sample, animate):
     if sample:
         input_data = (config.SAMPLE_DIR / "day06.txt").read_text()
     else:
         input_data = (config.USER_DIR / "day06.txt").read_text()
 
-
     input_data = input_data.splitlines()
+
+    if animate:
+        return animate_simulation(input_data)
 
     grid1 = Grid(input_data)
     visited, _, _ = run_simulation(grid1)
-        
+
     print(len(visited))
 
     my_answer = len(visited)
@@ -156,7 +190,6 @@ def day06(sample):
         submit(my_answer, part="a", day=6, year=2024)
 
     loops = 0
-
 
     # We could optimise this by starting the simulation from the last position of the previous loop,
     # but this is fast enough and I can't be bothered
