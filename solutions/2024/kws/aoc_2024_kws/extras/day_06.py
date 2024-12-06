@@ -28,8 +28,10 @@ def get_people_sprite(direction=(0, -1), step=0):
     elif direction == (-1, 0):
         step_offset += 0
 
+    sprit_row = 20 * 48
+
     return people_sprites.crop(
-        (step_offset, 0, step_offset + sprite_width, sprite_height)
+        (step_offset, sprit_row, step_offset + sprite_width, sprit_row + sprite_height)
     )
 
 
@@ -44,8 +46,9 @@ def get_thing_sprite(num=None):
 
 
 class GridImage:
-    def __init__(self, grid):
+    def __init__(self, grid, crop=None):
         self.grid = grid
+        self._crop = crop
 
         # Image size
         self.img_width = grid.width * tile_width
@@ -53,6 +56,14 @@ class GridImage:
 
         self.img = Image.new("RGB", (self.img_width, self.img_height), "white")
         self.draw = ImageDraw.Draw(self.img)
+
+    def in_bounds(self, x, y, cx, cy):
+        if self._crop:
+            dx, dy = abs(x - cx), abs(y - cy)
+            cx, cy = self._crop
+            in_bounds = dx <= cx * 1.5 and dy <= cy * 1.5
+            return in_bounds
+        return True
 
     def get_rhombus_coordinates(self, row, col):
         """Calculate the coordinates for a rhombus at the given grid position.
@@ -100,13 +111,12 @@ class GridImage:
                     fill=color,
                 )
 
-    def get_obstacle_sprite(self, pos):
+    def get_obstacle_sprite_position(self, pos):
         coords = self.get_rhombus_coordinates(pos[1], pos[0])
         cx, cy = coords["center"]
         cx -= 28
         cy -= 44
-        sprite = get_thing_sprite()
-        return sprite, (int(cx), int(cy))
+        return int(cx), int(cy)
 
     def get_guard_sprite(self, pos, direction=(0, -1), step=0):
         coords = self.get_rhombus_coordinates(pos[1], pos[0])
@@ -117,23 +127,26 @@ class GridImage:
         return sprite, (int(cx), int(cy))
 
     def draw_objects(self, guard_pos, heading=(0, -1), step=0, steps=None):
-        if steps is not None:
-            steps.append(self.get_rhombus_coordinates(guard_pos[1], guard_pos[0]))
-            for s in steps:
-                sx, sy = s["center"]
-                self.draw.ellipse((sx - 1, sy - 1, sx + 1, sy + 1), fill="grey")
-                sx += 2 * heading[0]
-                sy += 2 * heading[1]
-                self.draw.ellipse((sx - 1, sy - 1, sx + 1, sy + 1), fill="grey")
-
         sprites = {}
-        guard_sprite, sprite_pos = self.get_guard_sprite(guard_pos, heading, step)
-        sprites[sprite_pos] = guard_sprite
+        guard_sprite, guard_sprite_pos = self.get_guard_sprite(guard_pos, heading, step)
+        sprites[guard_sprite_pos] = guard_sprite
 
-        random.seed(0)
+        if steps is not None:
+            steps.append((guard_sprite_pos[0], guard_sprite_pos[1]))
+            for sx, sy in steps:
+                if self.in_bounds(sx, sy, *guard_sprite_pos):
+                    sx += sprite_width // 2
+                    sy += sprite_height
+                    self.draw.ellipse((sx - 1, sy - 1, sx + 1, sy + 1), fill="grey")
+                    sx += 2 * heading[0]
+                    sy += 2 * heading[1]
+                    self.draw.ellipse((sx - 1, sy - 1, sx + 1, sy + 1), fill="grey")
+
         for item in self.grid.grid.values():
-            sprite, sprite_pos = self.get_obstacle_sprite(item.position)
-            sprites[sprite_pos] = sprite
+            sprite_pos = self.get_obstacle_sprite_position(item.position)
+            if self.in_bounds(*sprite_pos, *guard_sprite_pos):
+                sprite = get_thing_sprite(item.sprite_id)
+                sprites[sprite_pos] = sprite
 
         sprite_positions = list(sprites.keys())
         sprite_positions.sort(key=lambda x: x[1])
@@ -156,7 +169,7 @@ class Animator:
         self.steps = []
 
     def draw_position(self, position, heading, crop=None, step=0):
-        img = GridImage(self.grid)
+        img = GridImage(self.grid, crop=crop)
         img.draw_floor()
         img.draw_objects(position, heading, step=step, steps=self.steps)
         if crop:

@@ -1,9 +1,12 @@
+import random
 import time
 
 import click
 from aoc_2024_kws.cli import main
 from aoc_2024_kws.config import config
 from aocd import submit
+
+random.seed(0)
 
 
 class Grid:
@@ -48,6 +51,7 @@ class Item:
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
+        self.sprite_id = random.randrange(0, 43)
 
     @property
     def position(self):
@@ -137,7 +141,7 @@ def run_simulation(grid):
     return visited, visited_heading, False
 
 
-def animate_simulation(input_data):
+def animate_simulation(input_data, single):
     grid = Grid(input_data)
     from aoc_2024_kws.extras.day_06 import Animator, GridImage
 
@@ -149,14 +153,17 @@ def animate_simulation(input_data):
             break
         if guard.blocked:
             guard.rotate_90_clockwise()
+            guard.move()
         else:
             guard.move()
 
         animator.draw(guard, crop=(200, 200))
-        # animator.images[0].show()
-        # import sys
-        # sys.exit(0)
-        if len(animator.images) > 250:
+        if single:
+            animator.images[0].show()
+            import sys
+
+            sys.exit(0)
+        if len(animator.images) > 400:
             break
 
         turn += 1
@@ -169,7 +176,8 @@ def animate_simulation(input_data):
 @main.command()
 @click.option("--sample", "-s", is_flag=True)
 @click.option("--animate", "-a", is_flag=True)
-def day06(sample, animate):
+@click.option("--single", "-S", is_flag=True)
+def day06(sample, animate, single):
     if sample:
         input_data = (config.SAMPLE_DIR / "day06.txt").read_text()
     else:
@@ -178,7 +186,7 @@ def day06(sample, animate):
     input_data = input_data.splitlines()
 
     if animate:
-        return animate_simulation(input_data)
+        return animate_simulation(input_data, single)
 
     grid1 = Grid(input_data)
     visited, _, _ = run_simulation(grid1)
