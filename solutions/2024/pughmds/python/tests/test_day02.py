@@ -18,6 +18,7 @@ def test_determine_distance_safeness_with_tolerance():
     res = determine_distance_safeness_with_tolerance(data)
     assert res == 10
 
+
 def test_determine_distance_safeness_with_tolerance_out_of_order():
     data = [5, 4, 6, 7, 8, 9]
     res = determine_distance_safeness_with_tolerance(data)
