@@ -1,4 +1,3 @@
-
 from typing import Generator
 import click
 from aocd import submit
@@ -130,15 +129,28 @@ def part_2(input_data, sample):
         start_pos += data_length + free_space_after
         input_data = input_data[2:]
 
+    from rich.table import Column
+    from rich.progress import Progress, BarColumn, TextColumn
 
+    text_column = TextColumn("{task.description}", table_column=Column(ratio=1))
+    bar_column = BarColumn(bar_width=None, table_column=Column(ratio=2))
+    progress = Progress(bar_column, text_column, expand=True)
 
-    for block in files.order_by_id(reverse=True):
-        print(block)
-        size = block.file.length
-        free_space = files.find_free_space(size)
-        if free_space and free_space[0] < block.start_pos:
-            print(f"Moving file {block.file.id} to {free_space[0]}")
-            block.start_pos = free_space[0]
+    moved = total = 0
+    with progress:
+        task = progress.add_task(description="Moving files", total=len(files))
+        for block in files.order_by_id(reverse=True):
+            size = block.file.length
+            free_space = files.find_free_space(size)
+            total += 1
+            if free_space and free_space[0] < block.start_pos:
+                block.start_pos = free_space[0]
+                moved += 1
+                progress.update(task, description=f"Moved {moved} of {total} files ({moved/total:.2%})", advance=1)
+            else:
+                progress.update(task, advance=1)
+    
+    print(f"Moved {moved} files")
 
     print("\nFile layout is now\n")
     check_sum = 0
