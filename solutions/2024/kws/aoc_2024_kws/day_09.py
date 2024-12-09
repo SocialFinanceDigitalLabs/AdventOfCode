@@ -1,3 +1,4 @@
+import math
 from typing import Generator
 import click
 from aocd import submit
@@ -56,8 +57,9 @@ class FileData:
 
 class FileRecord:
     def __init__(self, start_pos: int, file: FileData):
-        self.start_pos = start_pos
+        self.start_pos = self.original_start_pos = start_pos
         self.file = file
+        self.checked = False
 
     @property
     def end_pos(self):
@@ -71,6 +73,7 @@ class FileRecord:
     
     def __eq__(self, other):
         return self.file.id == other.file.id
+
 class DiskMap:
     def __init__(self, ):
         self.files = {}
@@ -114,6 +117,54 @@ class DiskMap:
 
     def __repr__(self):
         return f"DiskMap {self.files}"
+    
+class ImageGenerator:
+    def __init__(self, disk_length: int, output_dir: str):
+        self.disk_length = disk_length
+        self.output_dir = output_dir
+        self.dimensions = math.ceil(math.sqrt(disk_length))
+        self.step = 0
+
+    def generate_image(self, files: DiskMap, current_block: FileRecord):
+        from PIL import Image, ImageDraw
+        import os
+
+        # Create a new image with white background
+        img = Image.new('RGB', (self.dimensions, self.dimensions), 'white')
+        draw = ImageDraw.Draw(img)
+
+        sorted_records = files.order_by_start_pos()
+        for record in sorted_records:
+            if record is current_block and record.start_pos == record.original_start_pos:
+                color = 'red'
+            elif record is current_block:
+                color = 'purple'
+            elif record.start_pos != record.original_start_pos:
+                color = 'darkgreen'
+            elif record.checked:
+                color = 'green'
+            else:
+                color = 'blue'
+            
+            
+            # Color each pixel in the file's range
+            for pos in range(record.start_pos, record.end_pos + 1):
+                y = pos // self.dimensions
+                x = pos % self.dimensions
+                draw.point((x, y), fill=color)
+
+            if record is current_block:
+                for pos in range(record.original_start_pos, record.original_start_pos + record.file.length):
+                    y = pos // self.dimensions
+                    x = pos % self.dimensions
+                    draw.point((x, y), fill=color)
+
+        # Create output directory if it doesn't exist
+        os.makedirs(self.output_dir, exist_ok=True)
+        
+        # Save the image
+        img.save(f"{self.output_dir}/step_{self.step}.png")
+        self.step += 1
 
 def part_2(input_data, sample):
     files = DiskMap()
@@ -129,28 +180,20 @@ def part_2(input_data, sample):
         start_pos += data_length + free_space_after
         input_data = input_data[2:]
 
-    from rich.table import Column
-    from rich.progress import Progress, BarColumn, TextColumn
+    disk_length = files.order_by_start_pos()[-1].end_pos
 
-    text_column = TextColumn("{task.description}", table_column=Column(ratio=1))
-    bar_column = BarColumn(bar_width=None, table_column=Column(ratio=2))
-    progress = Progress(bar_column, text_column, expand=True)
+    image_generator = ImageGenerator(disk_length, "day09/images")
+    for block in track(files.order_by_id(reverse=True), description="Checking files"):
+        block.checked = True
+        size = block.file.length
 
-    moved = total = 0
-    with progress:
-        task = progress.add_task(description="Moving files", total=len(files))
-        for block in files.order_by_id(reverse=True):
-            size = block.file.length
-            free_space = files.find_free_space(size)
-            total += 1
-            if free_space and free_space[0] < block.start_pos:
-                block.start_pos = free_space[0]
-                moved += 1
-                progress.update(task, description=f"Moved {moved} of {total} files ({moved/total:.2%})", advance=1)
-            else:
-                progress.update(task, advance=1)
-    
-    print(f"Moved {moved} files")
+        free_space = files.find_free_space(size)
+        if free_space and free_space[0] < block.start_pos:
+            block.start_pos = free_space[0]
+        image_generator.generate_image(files, block)
+    image_generator.generate_image(files, None)
+        
+
 
     print("\nFile layout is now\n")
     check_sum = 0
