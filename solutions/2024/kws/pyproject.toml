@@ -21,6 +21,7 @@ pyglet = "<2"
 sympy = "^1.11.1"
 frozendict = "^2.3.4"
 browser-cookie3 = "^0.19.1"
+amulet-core = "^1.9.27"
 
 [tool.poetry.scripts]
 aoc24 = "aoc_2024_kws.cli:main"

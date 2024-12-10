@@ -81,10 +81,46 @@ class Map:
         visited.remove(pos_key)  # Allow revisiting this node in different paths
         return routes_to_nines
 
+    def mark_all_trails(self):
+        """Mark all trails on the map."""
+        trail_map = [[" " for _ in range(self.width)] for _ in range(self.height)]
+
+        def dfs(x, y, visited):
+            if (x, y) in visited:
+                return
+            visited.add((x, y))
+            trail_map[y][x] = "*"  # Mark the trail with a flag
+            for next_x, next_y in self.get_neighbors(x, y):
+                dfs(next_x, next_y, visited)
+
+        for x, y, _ in self.find_points_with_height(0):
+            visited = set()
+            dfs(x, y, visited)
+
+        # Combine the height and trail marker
+        combined_map = [
+            [f"{self.map[y][x]}{trail_map[y][x]}" for x in range(self.width)]
+            for y in range(self.height)
+        ]
+
+        return combined_map
+
+    def save_trail_map(self, trail_map, filename):
+        """Save the trail map to a file."""
+        with open(filename, "w") as f:
+            for row in trail_map:
+                f.write(" ".join(row) + "\n")
+
 
 @main.command()
 @click.option("--sample", "-s", is_flag=True)
-def day10(sample):
+@click.option(
+    "--export-trail",
+    "-e",
+    type=click.Path(file_okay=True, dir_okay=False, writable=True),
+    help="Full path to export the map with trails marked.",
+)
+def day10(sample, export_trail):
     if sample:
         input_data = (config.SAMPLE_DIR / "day10.txt").read_text()
     else:
@@ -115,3 +151,8 @@ def day10(sample):
 
     if not sample:
         submit(total_routes, part="b", day=10, year=2024)
+
+    if export_trail:
+        trail_map = map.mark_all_trails()
+        map.save_trail_map(trail_map, export_trail)
+        print(f"Trail map exported to {export_trail}.")
