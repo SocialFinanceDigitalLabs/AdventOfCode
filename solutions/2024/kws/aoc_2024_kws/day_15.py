@@ -1,4 +1,5 @@
 import sys
+import time
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Iterator, List, TextIO, Type, TypeVar
@@ -224,14 +225,19 @@ def test_run():
     map = """
 ##############
 ##......##..##
+##...@......##
 ##..........##
-##....[][]@.##
-##....[]....##
+##...[].....##
+##..........##
+##..[]......##
+##..........##
+##...[].....##
+##..........##
 ##..........##
 ##############
 """.strip()
 
-    instructions = "<vv<<^^<<^^"
+    instructions = "vvvvvvv"
 
     grid = Grid(map.splitlines())
     grid.print(sys.stdout)
@@ -295,15 +301,20 @@ def day15(sample, test):
     grid = Grid(part2_map)
     grid.print(sys.stdout)
 
+    left_boxes = list(grid.objects_of_type(LeftBox))
+    right_boxes = list(grid.objects_of_type(RightBox))
+    walls = list(grid.objects_of_type(Wall))
+
     for i in instructions:
         direction = Direction.from_symbol(i)
-        grid.robot.move(direction)
+        can_move = grid.robot.move(direction)
         # if can_move:
         #     print(f"After moving {direction} {i}:")
         #     grid.print(sys.stdout)
         # else:
         #     print(f"BLOOCKED from moving {direction} {i}")
         #     grid.print(sys.stdout)
+        # time.sleep(1)
 
     grid.print(sys.stdout)
 
@@ -313,6 +324,16 @@ def day15(sample, test):
 
     print()
     print(total_score)
+
+    new_left_boxes = list(grid.objects_of_type(LeftBox))
+    new_right_boxes = list(grid.objects_of_type(RightBox))
+    new_walls = list(grid.objects_of_type(Wall))
+
+    assert len(new_left_boxes) == len(left_boxes)
+    assert len(new_right_boxes) == len(right_boxes)
+    assert len(new_walls) == len(walls)
+
+    assert len(new_left_boxes) == len(new_right_boxes)
 
     if not sample:
         submit(total_score, part="b", day=15, year=2024)
